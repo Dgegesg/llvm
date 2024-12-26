@@ -1,32 +1,38 @@
-import socket
+from flask import Flask
 
-def start_server(host='127.0.0.1', port=8080):
-    # Create a socket object using IPv4 and TCP
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
-    # Bind the socket to the specified host and port
-    server_socket.bind((host, port))
-    
-    # Enable the server to accept connections (max 1 pending connection)
-    server_socket.listen(1)
-    print(f"Server started at http://{host}:{port}")
-    
-    while True:
-        # Accept an incoming connection from a client
-        client_socket, client_address = server_socket.accept()
-        print(f"Connection from {client_address}")
-        
-        # Receive the HTTP request from the client (buffer size 1024)
-        request = client_socket.recv(1024).decode()
-        
-        # Simple response, just sends "Hello, World!" as a plain text response
-        response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!"
-        
-        # Send the HTTP response to the client
-        client_socket.sendall(response.encode())
-        
-        # Close the connection with the client
-        client_socket.close()
+# Initialize the Flask application
+app = Flask(__name__)
 
-if __name__ == "__main__":
-    start_server()
+# Root URL
+@app.route('/')
+def home():
+    return 'Welcome to the Home Page!'
+
+# About page
+@app.route('/about')
+def about():
+    return 'This is the About Page.'
+
+# Contact page
+@app.route('/contact')
+def contact():
+    return 'This is the Contact Page. Reach us at contact@example.com'
+
+# Services page
+@app.route('/services')
+def services():
+    return 'Here are our services.'
+
+# Profile page with a variable in the URL (e.g., username)
+@app.route('/profile/<username>')
+def profile(username):
+    return f"Welcome to {username}'s Profile Page!"
+
+# Return JSON data (Example for APIs)
+@app.route('/api/data')
+def api_data():
+    return {"message": "This is a sample API response", "status": "success"}
+
+# Running the app
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=False)
