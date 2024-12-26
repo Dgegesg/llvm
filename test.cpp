@@ -4,6 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <arpa/inet.h> // For inet_addr
+#include <errno.h> // For errno
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
@@ -17,15 +19,16 @@ int main() {
     const char *hello = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!";
 
     // Create socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        std::cerr << "Socket creation failed: " << strerror(errno) << std::endl;
+        return EXIT_FAILURE;
     }
 
     // Attach socket to the port
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        std::cerr << "setsockopt failed: " << strerror(errno) << std::endl;
+        close(server_fd);
+        return EXIT_FAILURE;
     }
 
     address.sin_family = AF_INET;
@@ -34,22 +37,25 @@ int main() {
 
     // Bind the socket to the address
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
+        std::cerr << "Bind failed: " << strerror(errno) << std::endl;
+        close(server_fd);
+        return EXIT_FAILURE;
     }
 
     // Start listening for connections
     if (listen(server_fd, 3) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
+        std::cerr << "Listen failed: " << strerror(errno) << std::endl;
+        close(server_fd);
+        return EXIT_FAILURE;
     }
 
     // Accept incoming connections
     while (true) {
         std::cout << "Waiting for connections..." << std::endl;
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-            perror("accept");
-            exit(EXIT_FAILURE);
+            std::cerr << "Accept failed: " << strerror(errno) << std::endl;
+            close(server_fd);
+            return EXIT_FAILURE;
         }
 
         // Read the request
@@ -64,5 +70,6 @@ int main() {
         close(new_socket);
     }
 
-    return 0;
-}
+    // Close the server socket (this line will never be reached in this example)
+    close(server_fd);
+   
