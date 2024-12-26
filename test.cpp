@@ -1,27 +1,27 @@
 #include <iostream>
-#include <cstdio>
-#include <memory>
-#include <array>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 int main() {
-    // Command to execute
-    const char* cmd = "ifconfig";
-
-    // Open a pipe to the process
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    // Define the path to list the contents from
+    fs::path p = fs::current_path();  // or specify any other path
     
-    if (!pipe) {
-        std::cerr << "Error: Could not open pipe!" << std::endl;
-        return 1;
+    // Try to list the directory contents
+    try {
+        // Check if the path is a directory
+        if (fs::is_directory(p)) {
+            std::cout << "Listing contents of directory: " << p << std::endl;
+            
+            for (const auto& entry : fs::directory_iterator(p)) {
+                std::cout << entry.path().filename() << std::endl;
+            }
+        } else {
+            std::cerr << p << " is not a valid directory." << std::endl;
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "Error accessing the filesystem: " << e.what() << std::endl;
     }
-
-    // Buffer to hold data from the command output
-    std::array<char, 128> buffer;
     
-    // Read the output and print it to the console
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        std::cout << buffer.data();
-    }
-
     return 0;
 }
