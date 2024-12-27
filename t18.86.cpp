@@ -224,8 +224,9 @@ int main() {
     ui.addButton("Exit", 5, 10);
 
     // Add some labels
-    ui.addLabel("Label 1", 2, 5);
-    ui.addLabel("Label 2", 2, 15);
+    ui.addLabel("Label1", 6, 10);
+    ui.addLabel("Label2", 7, 10);
+    ui.addLabel("Label3", 8, 10);
 
     ui.run();
     return 0;
