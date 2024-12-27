@@ -1,21 +1,18 @@
 #include <iostream>
-#include <chrono>
-#include <cstdlib>  // For clearing the screen manually
-#include <vector>
-#include <string>
+#include <cstdlib>  // for system("clear")
+#include <chrono>   // for timing functions
 
 using namespace std;
 
 const int WIDTH = 40;  // Width of the screen
-const int HEIGHT = 20; // Height of the screen
+const int HEIGHT = 10; // Height of the screen
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
-const string TITLE = "V18 August UI"; // The title for the UI
+const string TITLE = "My Custom UI"; // The title for the UI
 
 // ANSI color codes
-const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (can be customized)
-const string BUTTON_BG_COLOR = "\033[47m"; // White background for buttons
-const string BUTTON_TEXT_COLOR = "\033[30m"; // Black text color for buttons
+const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (change this to any color)
+
 
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
@@ -43,13 +40,13 @@ public:
         }
     }
 
-    // Function to render the grid with a cursor and menu
-    string render(int cursorX, int cursorY, const vector<string>& menuItems, int menuIndex) const {
+    // Renders the grid, now building it in memory to minimize flicker
+    string render(int cursorX, int cursorY) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
-
+        
         // Render grid border and inside
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
@@ -66,22 +63,16 @@ public:
                 else if (x == 0 || x == width - 1) {
                     screen += "\033[1m|\033[0m"; // Bold left and right edges
                 }
-                // Draw the menu buttons
-                else if (x >= (width / 2) - 10 && x < (width / 2) + 10 &&
-                         y >= (height / 2) - menuItems.size() / 2 && y < (height / 2) + menuItems.size() / 2) {
-                    int index = y - (height / 2) + menuItems.size() / 2;
-                    if (index >= 0 && index < menuItems.size()) {
-                        if (index == menuIndex) {
-                            // Highlight the selected menu option
-                            screen += "\033[31m" + CURSOR_CHAR + "\033[0m"; // Red cursor ('X') on selected menu item
-                        } else {
-                            // Regular menu item
-                            screen += BUTTON_BG_COLOR + " " + "\033[0m";
-                        }
-                    }
+                // Draw the cursor
+                else if (x == cursorX && y == cursorY) {
+                    screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
                 }
-                else {
-                    screen += EMPTY_SPACE_COLOR + " \033[0m"; // Empty space with background color
+                // Draw the pixels (optional, can be used to mark user actions)
+                else if (grid[y][x] == '*') {
+                    screen += "\033[37m*\033[0m"; // White draw pixel
+                } else {
+                    // Apply color to the empty space
+                    screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
@@ -102,57 +93,52 @@ private:
 // UI class to handle user input and cursor movements
 class UI {
 public:
-    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1), menuIndex(0) {}
+    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void run() {
         grid.clear(); // Clear screen at the start
         showLoadingAnimation(); // Show loading animation before UI starts
 
-        vector<string> menuItems = {"Option 1", "Option 2", "Option 3", "Exit"};
         char input;
-        
         while (true) {
             // Build the UI screen in memory to minimize flickering
-            string screen = grid.render(cursorX, cursorY, menuItems, menuIndex);
+            string screen = grid.render(cursorX, cursorY);
 
             // Move the cursor to the top left of the screen, then output the content
             cout << "\033[H"; // Move cursor to top left
             cout << screen; // Output the built screen at once
 
-            cout << "Use arrow keys to move cursor, Enter to select: ";
+            cout << "Use WASD to move, Q to quit: ";
             cin >> input;
 
-            // Handle user input
             switch (input) {
                 case 'w':  // Move cursor up
-                    if (menuIndex > 0) menuIndex--;
+                    if (cursorY > 1) cursorY--;
                     break;
                 case 's':  // Move cursor down
-                    if (menuIndex < menuItems.size() - 1) menuIndex++;
+                    if (cursorY < HEIGHT - 2) cursorY++;
                     break;
-                case 13:  // Enter key pressed (to simulate menu selection)
-                    if (menuIndex == menuItems.size() - 1) {
-                        cout << "Exiting..." << endl;
-                        return;
-                    } else {
-                        cout << "You selected: " << menuItems[menuIndex] << endl;
-                    }
+                case 'a':  // Move cursor left
+                    if (cursorX > 1) cursorX--;
+                    break;
+                case 'd':  // Move cursor right
+                    if (cursorX < WIDTH - 2) cursorX++;
                     break;
                 case 'q':  // Quit the program
                     cout << "Exiting..." << endl;
                     return;
                 default:
+                    cout << "Invalid input!" << endl;
                     break;
             }
 
-            customSleep(100); // Delay for 100 milliseconds to simulate smooth UI
+            customSleep(100); // Delay for 100 milliseconds
         }
     }
 
 private:
     Grid grid;
     int cursorX, cursorY;
-    int menuIndex;
 
     // Custom sleep to avoid overloading CPU with tight loops
     void customSleep(int milliseconds) {
@@ -170,9 +156,10 @@ private:
                 for (int dotCount = 0; dotCount < j; ++dotCount) {
                     dots += ".";
                 }
-                // Display the loading dots without clearing the screen
+                // Clear the screen before displaying the loading dots
+                grid.clear();
                 cout << "\033[HLoading" + dots << flush;
-                customSleep(100); // Delay for 500 milliseconds
+                customSleep(500); // Delay for 500 milliseconds
             }
         }
     }
