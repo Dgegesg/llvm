@@ -35,33 +35,36 @@ public:
         }
     }
 
-    void draw(int cursorX, int cursorY) const {
+    // Renders the grid, now building it in memory to minimize flicker
+    string render(int cursorX, int cursorY) const {
+        string screen = "";
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 // Draw grid borders and corners
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
-                    cout << "+"; // Corners
+                    screen += "+"; // Corners
                 }
                 else if (y == 0 || y == height - 1) {
-                    cout << "-"; // Top and bottom edges
+                    screen += "-"; // Top and bottom edges
                 }
                 else if (x == 0 || x == width - 1) {
-                    cout << "|"; // Left and right edges
+                    screen += "|"; // Left and right edges
                 }
                 // Draw the cursor
                 else if (x == cursorX && y == cursorY) {
-                    cout << "\033[31m\033[47m" << CURSOR_CHAR << "\033[0m"; // Red cursor
+                    screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor
                 }
                 // Draw the pixels (optional, can be used to mark user actions)
                 else if (grid[y][x] == '*') {
-                    cout << "\033[37m*\033[0m"; // White draw pixel
+                    screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    cout << " "; // Empty space
+                    screen += " "; // Empty space
                 }
             }
-            cout << endl;
+            screen += "\n";
         }
+        return screen;
     }
 
     void clear() {
@@ -81,8 +84,14 @@ public:
     void run() {
         char input;
         while (true) {
-            grid.clear();  // Clear the screen before each draw
-            grid.draw(cursorX, cursorY);  // Draw the grid with the cursor
+            // Build the UI screen in memory to minimize flickering
+            string screen = grid.render(cursorX, cursorY);
+
+            // Clear the terminal screen
+            grid.clear();
+            
+            // Output the built screen at once to avoid flicker
+            cout << screen;
 
             cout << "Use WASD to move, Q to quit: ";
             cin >> input;
