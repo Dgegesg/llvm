@@ -3,7 +3,6 @@
 #include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
-#include <unordered_set>
 
 using namespace std;
 
@@ -120,17 +119,20 @@ public:
     void addButton(string label, int row, int col) {
         // Check for existing button at the given position (to avoid duplicates)
         pair<int, int> buttonPos = {row, col};
-        if (buttonPositionSet.find(buttonPos) == buttonPositionSet.end()) {
-            // Ensure button is within the bounds of the grid (not on the border)
-            if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-                buttons.push_back(label);
-                buttonPositions.push_back(buttonPos);
-                buttonPositionSet.insert(buttonPos);  // Track added position
-            } else {
-                cout << "Button '" << label << "' cannot be placed on the border!" << endl;
+        // Check if the position is already in the vector
+        for (auto& existingPos : buttonPositions) {
+            if (existingPos == buttonPos) {
+                cout << "Duplicate button at (" << row << ", " << col << ") ignored!" << endl;
+                return;
             }
+        }
+
+        // Ensure button is within the bounds of the grid (not on the border)
+        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+            buttons.push_back(label);
+            buttonPositions.push_back(buttonPos);  // Track added position
         } else {
-            cout << "Duplicate button at (" << row << ", " << col << ") ignored!" << endl;
+            cout << "Button '" << label << "' cannot be placed on the border!" << endl;
         }
     }
 
@@ -183,7 +185,6 @@ private:
     int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
-    unordered_set<pair<int, int>, hash_pair> buttonPositionSet;  // To track added button positions
 
     // Custom sleep to avoid overloading CPU with tight loops
     void customSleep(int milliseconds) {
