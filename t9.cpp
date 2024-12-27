@@ -16,7 +16,7 @@ void initGrid() {
     }
 }
 
-// Function to draw the grid in the terminal
+// Function to draw the grid with rounded corners and edges
 void drawGrid(int cursorX, int cursorY) {
     // Clear the terminal screen (platform-specific)
     #ifdef _WIN32
@@ -25,20 +25,41 @@ void drawGrid(int cursorX, int cursorY) {
         system("clear"); // Unix/Linux/Mac command to clear the screen
     #endif
     
-    // Draw the grid
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
-            if (x == cursorX && y == cursorY) {
-                // Set red foreground with white background for the cursor 'X'
-                cout << "\033[31m\033[47mX\033[0m";  
+            // Draw top-left corner
+            if (x == 0 && y == 0) {
+                cout << "╭";  // Top-left corner
+            }
+            // Draw top-right corner
+            else if (x == WIDTH - 1 && y == 0) {
+                cout << "╮";  // Top-right corner
+            }
+            // Draw bottom-left corner
+            else if (x == 0 && y == HEIGHT - 1) {
+                cout << "╰";  // Bottom-left corner
+            }
+            // Draw bottom-right corner
+            else if (x == WIDTH - 1 && y == HEIGHT - 1) {
+                cout << "╯";  // Bottom-right corner
+            }
+            // Draw horizontal edges (excluding corners)
+            else if (y == 0 || y == HEIGHT - 1) {
+                cout << "─";  // Top and bottom edges
+            }
+            // Draw vertical edges (excluding corners)
+            else if (x == 0 || x == WIDTH - 1) {
+                cout << "│";  // Left and right edges
+            }
+            // Draw the cursor at the current position
+            else if (x == cursorX && y == cursorY) {
+                cout << "\033[31m\033[47mX\033[0m";  // Red text with white background for the cursor
+            }
+            // Draw the drawn pixels in the grid
+            else if (grid[y][x] == '*') {
+                cout << "\033[37m*\033[0m";  // Draw pixel in white
             } else {
-                if (grid[y][x] == '*') {
-                    // Draw pixel in white
-                    cout << "\033[37m*\033[0m";
-                } else {
-                    // Display the empty space as a square block
-                    cout << "█"; 
-                }
+                cout << "█";  // Empty space as a filled square block
             }
         }
         cout << endl;
@@ -57,7 +78,7 @@ int main() {
     // Initialize the grid with empty pixels
     initGrid();
     
-    int cursorX = 0, cursorY = 0;  // Start cursor position at the top-left corner
+    int cursorX = 1, cursorY = 1;  // Start cursor position at the top-left corner (inside the border)
     char input;  // To store user input
 
     while (true) {
@@ -69,16 +90,16 @@ int main() {
 
         switch (input) {
             case 'w':  // Move cursor up
-                if (cursorY > 0) cursorY--;
+                if (cursorY > 1) cursorY--;  // Prevent cursor from going outside the top border
                 break;
             case 's':  // Move cursor down
-                if (cursorY < HEIGHT - 1) cursorY++;
+                if (cursorY < HEIGHT - 2) cursorY++;  // Prevent cursor from going outside the bottom border
                 break;
             case 'a':  // Move cursor left
-                if (cursorX > 0) cursorX--;
+                if (cursorX > 1) cursorX--;  // Prevent cursor from going outside the left border
                 break;
             case 'd':  // Move cursor right
-                if (cursorX < WIDTH - 1) cursorX++;
+                if (cursorX < WIDTH - 2) cursorX++;  // Prevent cursor from going outside the right border
                 break;
             case ' ':  // Draw pixel at current cursor position
                 drawPixel(cursorX, cursorY);
