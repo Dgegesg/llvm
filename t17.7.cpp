@@ -80,8 +80,9 @@ public:
         return screen; // Return the built string of the UI
     }
 
-    void clear() {
-        system("clear"); // Linux only, clears the screen
+    // This method only clears the screen at the beginning (to avoid flicker during the loop)
+    void clear() const {
+        cout << "\033[H\033[J"; // ANSI escape sequence to clear the screen (and move cursor to top-left)
     }
 
 private:
@@ -95,16 +96,16 @@ public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void run() {
+        grid.clear(); // Clear screen at the start
+
         char input;
         while (true) {
             // Build the UI screen in memory to minimize flickering
             string screen = grid.render(cursorX, cursorY);
 
-            // Clear the terminal screen (only once per frame)
-            grid.clear(); // Only clear the screen once per frame
-
-            // Output the built screen at once to avoid flicker
-            cout << screen; // Output the full screen content at once
+            // Move the cursor to the top left of the screen, then output the content
+            cout << "\033[H"; // Move cursor to top left
+            cout << screen; // Output the built screen at once
 
             cout << "Use WASD to move, Q to quit: ";
             cin >> input;
