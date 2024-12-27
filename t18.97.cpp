@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int WIDTH = 40;  // Width of the screen
+const int WIDTH = 40;  // Width of each UI grid
 const int HEIGHT = 10; // Height of the screen
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
