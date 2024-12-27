@@ -71,13 +71,7 @@ public:
                          y >= (height / 2) - menuItems.size() / 2 && y < (height / 2) + menuItems.size() / 2) {
                     int index = y - (height / 2) + menuItems.size() / 2;
                     if (index >= 0 && index < menuItems.size()) {
-                        if (x == (width / 2) - 10) {
-                            // Left border of the button
-                            screen += BUTTON_BG_COLOR + " " + "\033[0m";
-                        } else if (x == (width / 2) + 9) {
-                            // Right border of the button
-                            screen += BUTTON_BG_COLOR + " " + "\033[0m";
-                        } else if (index == menuIndex) {
+                        if (index == menuIndex) {
                             // Highlight the selected menu option
                             screen += "\033[31m" + CURSOR_CHAR + "\033[0m"; // Red cursor ('X') on selected menu item
                         } else {
@@ -128,6 +122,7 @@ public:
             cout << "Use arrow keys to move cursor, Enter to select: ";
             cin >> input;
 
+            // Handle user input
             switch (input) {
                 case 'w':  // Move cursor up
                     if (menuIndex > 0) menuIndex--;
