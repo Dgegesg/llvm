@@ -1,10 +1,10 @@
 #include <iostream>
 #include <cstdlib> // for system("clear") or system("cls")
 #include <chrono>  // for timing functions
-#include <thread>  // for std::this_thread::sleep_for
 
 using namespace std;
 
+// Constants for screen size
 const int WIDTH = 20;  // Width of the screen (number of "pixels")
 const int HEIGHT = 10; // Height of the screen (number of "pixels")
 char grid[HEIGHT][WIDTH]; // The pixel grid
@@ -18,14 +18,13 @@ void initGrid() {
     }
 }
 
-// Function to implement a custom sleep
+// Function to implement a custom sleep (without using <thread> or <unistd.h>)
 void customSleep(int milliseconds) {
-    // Get the current time
     auto start = chrono::steady_clock::now();
-
-    // Loop until the specified amount of time has passed
+    
+    // Busy-wait loop until the desired time has passed
     while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
-        // Just keep the loop running until the time has passed
+        // Empty loop; just waiting for the specified amount of time
     }
 }
 
@@ -114,7 +113,7 @@ int main() {
                 break;
         }
 
-        // Adding a small delay to make the UI feel smoother (without using unistd.h)
+        // Adding a small delay to make the UI feel smoother
         customSleep(100); // Delay for 100 milliseconds to make the interface more responsive
     }
 
