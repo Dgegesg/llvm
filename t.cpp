@@ -1,5 +1,6 @@
 #include <iostream>
-#include <unistd.h> // For sleep function
+#include <unistd.h>  // For sleep function
+#include <termios.h> // For terminal I/O control
 
 using namespace std;
 
@@ -39,6 +40,19 @@ void drawGrid() {
     }
 }
 
+// Function to get a single character input from the user without waiting for Enter
+char getKeyPress() {
+    struct termios oldt, newt;
+    char ch;
+    tcgetattr(STDIN_FILENO, &oldt);  // Get the current terminal settings
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);  // Disable canonical mode and echo
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);  // Set new terminal settings
+    ch = getchar();  // Read a character
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // Restore the old terminal settings
+    return ch;
+}
+
 int main() {
     // Initialize the grid
     initGrid();
@@ -49,19 +63,42 @@ int main() {
     // Draw the initial grid
     drawGrid();
 
-    // Simulate drawing pixels by replacing a few dots with a character
-    drawPixel(5, 3);  // Draw a pixel at (5, 3)
-    drawPixel(10, 4); // Draw a pixel at (10, 4)
-    drawPixel(15, 2); // Draw a pixel at (15, 2)
+    // Main loop to handle keypresses
+    bool running = true;
+    int cursorX = 0, cursorY = 0;  // Initial cursor position
+    while (running) {
+        // Get user input without pressing Enter
+        char key = getKeyPress();
 
-    // Redraw the grid with the updated pixels
-    drawGrid();
+        switch (key) {
+            case 'w':  // Move cursor up
+                if (cursorY > 0) cursorY--;
+                break;
+            case 's':  // Move cursor down
+                if (cursorY < HEIGHT - 1) cursorY++;
+                break;
+            case 'a':  // Move cursor left
+                if (cursorX > 0) cursorX--;
+                break;
+            case 'd':  // Move cursor right
+                if (cursorX < WIDTH - 1) cursorX++;
+                break;
+            case 'q':  // Quit the program
+                running = false;
+                break;
+            case ' ':  // Draw pixel at current cursor position
+                drawPixel(cursorX, cursorY);
+                break;
+        }
 
-    // Pause to view the output
-    sleep(3);
+        // Clear the screen and redraw the grid with updated pixels
+        cout << "\033[2J";  // Clear the screen
+        drawGrid();
 
-    // Clear the screen after the pause
-    cout << "\033[2J";  // ANSI escape sequence to clear screen
+        // Show the cursor position on the grid
+        drawPixel(cursorX, cursorY, 'X');  // Mark the cursor with 'X'
+        drawGrid();
+    }
 
     return 0;
 }
