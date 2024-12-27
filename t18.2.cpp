@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdlib>  // for system("clear")
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -93,42 +94,54 @@ private:
 // UI class to handle user input and cursor movements
 class UI {
 public:
-    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
+    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1), selectedMenuOption(0) {
+        // Initialize the menu options
+        menuOptions.push_back("Start Game");
+        menuOptions.push_back("Settings");
+        menuOptions.push_back("Exit");
+    }
 
     void run() {
         grid.clear(); // Clear screen at the start
         showLoadingAnimation(); // Show loading animation before UI starts
 
-        char input;
         while (true) {
             // Build the UI screen in memory to minimize flickering
             string screen = grid.render(cursorX, cursorY);
+
+            // Add menu rendering
+            screen += "\nUse WASD to move, Enter to select, Q to quit.\n";
+
+            // Display the menu with the cursor position
+            for (int i = 0; i < menuOptions.size(); ++i) {
+                if (i == selectedMenuOption) {
+                    screen += "> " + menuOptions[i] + "\n"; // Highlight the selected option
+                } else {
+                    screen += "  " + menuOptions[i] + "\n";
+                }
+            }
 
             // Move the cursor to the top left of the screen, then output the content
             cout << "\033[H"; // Move cursor to top left
             cout << screen; // Output the built screen at once
 
-            cout << "Use WASD to move, Q to quit: ";
+            char input;
             cin >> input;
 
             switch (input) {
                 case 'w':  // Move cursor up
-                    if (cursorY > 1) cursorY--;
+                    if (selectedMenuOption > 0) selectedMenuOption--;
                     break;
                 case 's':  // Move cursor down
-                    if (cursorY < HEIGHT - 2) cursorY++;
-                    break;
-                case 'a':  // Move cursor left
-                    if (cursorX > 1) cursorX--;
-                    break;
-                case 'd':  // Move cursor right
-                    if (cursorX < WIDTH - 2) cursorX++;
+                    if (selectedMenuOption < menuOptions.size() - 1) selectedMenuOption++;
                     break;
                 case 'q':  // Quit the program
                     quitAnimation();  // Start the quit animation
                     return;
+                case '\n':  // Enter key to select menu option
+                    handleMenuSelection();
+                    break;
                 default:
-                    cout << "Invalid input!" << endl;
                     break;
             }
 
@@ -139,6 +152,8 @@ public:
 private:
     Grid grid;
     int cursorX, cursorY;
+    int selectedMenuOption;
+    vector<string> menuOptions;
 
     // Custom sleep to avoid overloading CPU with tight loops
     void customSleep(int milliseconds) {
@@ -160,6 +175,25 @@ private:
                 cout << "\033[HLoading" + dots << flush;
                 customSleep(100); // Delay for 500 milliseconds
             }
+        }
+    }
+
+    // Handle menu selection based on the selected option
+    void handleMenuSelection() {
+        switch (selectedMenuOption) {
+            case 0:  // Start Game
+                cout << "\033[HStarting game...\n"; // Add more functionality here for starting the game
+                customSleep(500);
+                break;
+            case 1:  // Settings
+                cout << "\033[HOpening settings...\n"; // Add more functionality here for settings
+                customSleep(500);
+                break;
+            case 2:  // Exit
+                quitAnimation();
+                return;
+            default:
+                break;
         }
     }
 
