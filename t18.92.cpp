@@ -225,8 +225,8 @@ int main() {
 
     // Add some labels
     ui.addLabel("Label1", 6, 5);  // Ensure unique column for each label
-    ui.addLabel("Label2", 6, 15);
-    ui.addLabel("Label3", 6, 25);
+    ui.addLabel("Label2", 7, 5);  // New line automatically
+    ui.addLabel("Label3", 8, 5);  // Continuing in the next row
 
     ui.run();
     return 0;
