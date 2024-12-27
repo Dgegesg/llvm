@@ -159,16 +159,16 @@ public:
 
             switch (input) {
                 case 'w':  // Move cursor up
-                    if (cursorY > 1) cursorY--;
+                    if (cursorY > 1) cursorY--;  // Ensure cursor stays within bounds
                     break;
                 case 's':  // Move cursor down
-                    if (cursorY < HEIGHT - 2) cursorY++;
+                    if (cursorY < HEIGHT - 2) cursorY++;  // Ensure cursor stays within bounds
                     break;
                 case 'a':  // Move cursor left
-                    if (cursorX > 1) cursorX--;
+                    if (cursorX > 1) cursorX--;  // Ensure cursor stays within bounds
                     break;
                 case 'd':  // Move cursor right
-                    if (cursorX < WIDTH - 2) cursorX++;
+                    if (cursorX < WIDTH - 2) cursorX++;  // Ensure cursor stays within bounds
                     break;
                 case 'e':  // Press button under cursor
                     pressButton(cursorX, cursorY);
@@ -231,7 +231,7 @@ private:
 int main() {
     UI ui(WIDTH, HEIGHT);
     
-    // Add some buttons
+    // Add some buttons within the grid
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
     ui.addButton("Exit", 5, 10);
