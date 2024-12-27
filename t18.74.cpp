@@ -3,6 +3,7 @@
 #include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 using namespace std;
 
@@ -117,12 +118,19 @@ public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void addButton(string label, int row, int col) {
-        // Ensure button is within the bounds of the grid (not on the border)
-        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-            buttons.push_back(label);
-            buttonPositions.push_back({row, col});
+        // Check for existing button at the given position (to avoid duplicates)
+        pair<int, int> buttonPos = {row, col};
+        if (buttonPositionSet.find(buttonPos) == buttonPositionSet.end()) {
+            // Ensure button is within the bounds of the grid (not on the border)
+            if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+                buttons.push_back(label);
+                buttonPositions.push_back(buttonPos);
+                buttonPositionSet.insert(buttonPos);  // Track added position
+            } else {
+                cout << "Button '" << label << "' cannot be placed on the border!" << endl;
+            }
         } else {
-            cout << "Button '" << label << "' cannot be placed on the border!" << endl;
+            cout << "Duplicate button at (" << row << ", " << col << ") ignored!" << endl;
         }
     }
 
@@ -175,6 +183,7 @@ private:
     int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
+    unordered_set<pair<int, int>, hash_pair> buttonPositionSet;  // To track added button positions
 
     // Custom sleep to avoid overloading CPU with tight loops
     void customSleep(int milliseconds) {
@@ -225,6 +234,7 @@ int main() {
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
     ui.addButton("Exit", 5, 10);
+    ui.addButton("Start", 3, 10);  // This should be ignored as a duplicate
 
     ui.run();
     return 0;
