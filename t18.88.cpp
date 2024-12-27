@@ -224,7 +224,7 @@ int main() {
     ui.addButton("Exit", 5, 10);
 
     // Add some labels
-    ui.addLabel("Label1", 6, 5);
+    ui.addLabel("Label1", 6, 5);  // Ensure unique column for each label
     ui.addLabel("Label2", 6, 15);
     ui.addLabel("Label3", 6, 25);
 
