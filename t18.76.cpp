@@ -75,9 +75,9 @@ public:
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
                         int buttonX = buttonPositions[i].second;
                         int buttonY = buttonPositions[i].first;
-                        int buttonWidth = buttons[i].length() + 2; // button label width + padding around it
+                        int buttonWidth = buttons[i].length() + 2; // Button width (padding around it)
 
-                        // Check if cursor is within the bounds of the button (in the button area)
+                        // Check if cursor is within the bounds of the button (button area)
                         if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
 
@@ -119,14 +119,6 @@ public:
     void addButton(string label, int row, int col) {
         // Check for existing button at the given position (to avoid duplicates)
         pair<int, int> buttonPos = {row, col};
-        // Check if the position is already in the vector
-        for (auto& existingPos : buttonPositions) {
-            if (existingPos == buttonPos) {
-                cout << "Duplicate button at (" << row << ", " << col << ") ignored!" << endl;
-                return;
-            }
-        }
-
         // Ensure button is within the bounds of the grid (not on the border)
         if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
             buttons.push_back(label);
@@ -215,7 +207,7 @@ private:
         for (size_t i = 0; i < buttonPositions.size(); ++i) {
             int buttonX = buttonPositions[i].second;
             int buttonY = buttonPositions[i].first;
-            int buttonWidth = buttons[i].length() + 2; // button label width + padding around it
+            int buttonWidth = buttons[i].length() + 2; // Button label width + padding around it
 
             // Check if the cursor is inside the button's bounds
             if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
