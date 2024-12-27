@@ -17,6 +17,8 @@ const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when curso
 const string CURSOR_COLOR = "\033[31m\033[47m"; // Red cursor with white background
 const string CONSOLE_LOG_COLOR = "\033[42m"; // Green background for console log grid
 
+const int MAX_LOG_LINES = 8; // Max number of lines to display in the console log
+
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
 public:
@@ -121,14 +123,20 @@ public:
         }
     }
 
-    void addLabel(string text, int row, int col) {
-        // Ensure label is within the bounds of the grid
-        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-            labels.push_back(text);
-            labelPositions.push_back({row, col});  // Track added position
-        } else {
-            cout << "Label '" << text << "' cannot be placed on the border!" << endl;
+    void consoleEcho(string message) {
+        // Add message to the log, trimming if necessary
+        if (consoleLog.size() >= MAX_LOG_LINES) {
+            consoleLog.erase(consoleLog.begin()); // Remove oldest line if limit exceeded
         }
+        consoleLog.push_back(message);  // Add new message
+    }
+
+    void switchToInteractivePage() {
+        activePage = 1;
+    }
+
+    void switchToConsoleLogPage() {
+        activePage = 2;
     }
 
     void run() {
@@ -158,8 +166,8 @@ private:
     int cursorX, cursorY, activePage;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
-    vector<string> labels;  // Label texts
-    vector<pair<int, int>> labelPositions;  // Label positions (row, col)
+    vector<string> consoleLog;  // Console log messages
+    const int MAX_LOG_LINES = 8;
 
     void renderInteractivePage() {
         string screen = grid.render(cursorX, cursorY, buttons, buttonPositions);
@@ -168,7 +176,16 @@ private:
 
     void renderConsoleLogPage() {
         string screen = grid.render(1, 1, {}, {});  // Empty interactive grid for console log
-        screen = CONSOLE_LOG_COLOR + screen + "\033[0m"; // Green background for console log
+        screen = CONSOLE_LOG_COLOR; // Set background color for console log
+        int linesToDisplay = min((int)consoleLog.size(), MAX_LOG_LINES);  // Display up to MAX_LOG_LINES
+        for (int i = consoleLog.size() - linesToDisplay; i < consoleLog.size(); ++i) {
+            string message = consoleLog[i];
+            if (message.length() > WIDTH - 2) { // Cut long messages
+                message = message.substr(0, WIDTH - 2);
+            }
+            screen += "\n" + message;
+        }
+        screen += "\033[0m"; // Reset color after displaying log
         cout << "\033[H" << screen << "Use 1 to switch back to Interactive Page\n";
     }
 
@@ -190,10 +207,10 @@ private:
                 pressButton(cursorX, cursorY);
                 break;
             case '1':  // Switch to Interactive Page
-                activePage = 1;
+                switchToInteractivePage();
                 break;
             case '2':  // Switch to Console Log Page
-                activePage = 2;
+                switchToConsoleLogPage();
                 break;
             case 'q':  // Quit the program
                 cout << "Exiting..." << endl;
@@ -217,7 +234,7 @@ private:
                 return;
             }
         }
-        cout << "\033[HNo button at the cursor position!" << endl;
+        consoleEcho("No button at the cursor position!");
     }
 
     void executeButtonAction(int index) {
@@ -236,10 +253,6 @@ private:
                 consoleEcho("Unknown button action!");
                 break;
         }
-    }
-
-    void consoleEcho(const string& message) {
-        cout << "\033[H" << message << endl;
     }
 };
 
