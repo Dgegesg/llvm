@@ -75,12 +75,15 @@ public:
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
                         if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
                             buttonFound = true;
+                            int buttonWidth = buttons[i].length() + 2; // button label width + padding around it
                             // Highlight button when the cursor is over it
                             if (cursorX == x && cursorY == y) {
                                 screen += BUTTON_COLOR + " " + buttons[i] + " \033[0m"; // Active button
                             } else {
                                 screen += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m"; // Normal button
                             }
+                            // Skip the button width in the same row
+                            x += buttonWidth - 1;  // Adjust the x to skip the button width
                             break;
                         }
                     }
