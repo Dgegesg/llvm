@@ -12,7 +12,7 @@ char grid[HEIGHT][WIDTH];
 void initGrid() {
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
-            grid[y][x] = '.';  // Set all pixels to be empty (represented by '.')
+            grid[y][x] = '∎';  // Set all pixels to be empty (represented by '.')
         }
     }
 }
