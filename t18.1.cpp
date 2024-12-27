@@ -1,6 +1,7 @@
 #include <iostream>
+#include <chrono>
 #include <cstdlib>  // for system("clear")
-#include <chrono>   // for timing functions
+#include <string>
 
 using namespace std;
 
@@ -11,8 +12,7 @@ const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "V18 August UI"; // The title for the UI
 
 // ANSI color codes
-const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (change this to any color)
-
+const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (can be customized)
 
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
@@ -125,7 +125,7 @@ public:
                     if (cursorX < WIDTH - 2) cursorX++;
                     break;
                 case 'q':  // Quit the program
-                    cout << "Exiting..." << endl;
+                    quitAnimation();  // Start the quit animation
                     return;
                 default:
                     cout << "Invalid input!" << endl;
@@ -161,6 +161,17 @@ private:
                 customSleep(100); // Delay for 500 milliseconds
             }
         }
+    }
+
+    // Quit animation to simulate smooth quitting
+    void quitAnimation() {
+        for (int i = 0; i < 5; ++i) {
+            cout << "\033[HQuitting" << flush; // Display quit message
+            customSleep(500);  // Delay for half a second
+            cout << "\033[H" << string(10, ' ') << "\033[H"; // Clear the message
+            customSleep(500);  // Delay for half a second
+        }
+        cout << "\033[HExiting... \033[0m\n"; // Final exit message
     }
 };
 
