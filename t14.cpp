@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstdlib> // for system("clear") or system("cls")
+#include <chrono>  // for timing functions
+#include <thread>  // for std::this_thread::sleep_for
 
 using namespace std;
 
@@ -13,6 +15,17 @@ void initGrid() {
         for (int x = 0; x < WIDTH; ++x) {
             grid[y][x] = ' ';  // Initialize all pixels as empty (using space)
         }
+    }
+}
+
+// Function to implement a custom sleep
+void customSleep(int milliseconds) {
+    // Get the current time
+    auto start = chrono::steady_clock::now();
+
+    // Loop until the specified amount of time has passed
+    while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
+        // Just keep the loop running until the time has passed
     }
 }
 
@@ -100,6 +113,9 @@ int main() {
                 cout << "Invalid input!" << endl;
                 break;
         }
+
+        // Adding a small delay to make the UI feel smoother (without using unistd.h)
+        customSleep(100); // Delay for 100 milliseconds to make the interface more responsive
     }
 
     return 0;
