@@ -217,7 +217,7 @@ private:
                 exit(0);
                 break;
             default:
-                cout << "Invalid input!" << endl;
+                consoleEcho("Invalid input!");
                 break;
         }
     }
