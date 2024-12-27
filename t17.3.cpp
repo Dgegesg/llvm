@@ -67,7 +67,7 @@ public:
                 else if (grid[y][x] == '*') {
                     screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    screen += "\033[47m \033[0m"; // Empty space with white background
+                    screen += "\033[47m "; // Empty space with white background
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
@@ -95,7 +95,7 @@ public:
             // Build the UI screen in memory to minimize flickering
             string screen = grid.render(cursorX, cursorY);
 
-            // Clear the terminal screen
+            // Clear the terminal screen (only once per frame)
             grid.clear(); // Only clear the screen once per frame
 
             // Output the built screen at once to avoid flicker
