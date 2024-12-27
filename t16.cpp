@@ -4,7 +4,6 @@
 
 using namespace std;
 
-// Constants for screen size
 const int WIDTH = 20;  // Width of the screen (number of "pixels")
 const int HEIGHT = 10; // Height of the screen (number of "pixels")
 char grid[HEIGHT][WIDTH]; // The pixel grid
@@ -113,7 +112,7 @@ int main() {
                 break;
         }
 
-        // Adding a small delay to make the UI feel smoother
+        // Adding a small delay to make the UI feel smoother and reduce flicker
         customSleep(100); // Delay for 100 milliseconds to make the interface more responsive
     }
 
