@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int WIDTH = 40;  // Width of each UI grid
+const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
@@ -226,9 +226,15 @@ int main() {
     ui1.addButton("Options", 4, 10);
     ui1.addButton("Exit", 5, 10);
 
-    ui2.run();
+    ui2.addButton("Load", 3, 10);
+    ui2.addButton("Save", 4, 10);
 
-    ui1.run(); // Interactive UI
+    // Running both UIs in separate threads (simplified, not true parallel processing)
+    thread t1(&UI::run, &ui1);  // Running UI1
+    thread t2(&UI::run, &ui2);  // Running UI2
+
+    t1.join();  // Wait for UI1 to complete
+    t2.join();  // Wait for UI2 to complete
 
     return 0;
 }
