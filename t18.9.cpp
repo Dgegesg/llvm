@@ -70,13 +70,13 @@ public:
                 } else {
                     bool buttonFound = false;
                     bool labelFound = false;
+
                     // Check if we are on a button
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
                         int buttonX = buttonPositions[i].second;
                         int buttonY = buttonPositions[i].first;
                         int buttonWidth = buttons[i].length(); // Button width
 
-                        // Check if x and y match the button position
                         if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
 
