@@ -1,6 +1,4 @@
 #include <iostream>
-#include <unistd.h>  // For sleep function
-#include <termios.h> // For terminal I/O control
 
 using namespace std;
 
@@ -40,19 +38,6 @@ void drawGrid() {
     }
 }
 
-// Function to get a single character input from the user without waiting for Enter
-char getKeyPress() {
-    struct termios oldt, newt;
-    char ch;
-    tcgetattr(STDIN_FILENO, &oldt);  // Get the current terminal settings
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);  // Disable canonical mode and echo
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);  // Set new terminal settings
-    ch = getchar();  // Read a character
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // Restore the old terminal settings
-    return ch;
-}
-
 int main() {
     // Initialize the grid
     initGrid();
@@ -66,9 +51,11 @@ int main() {
     // Main loop to handle keypresses
     bool running = true;
     int cursorX = 0, cursorY = 0;  // Initial cursor position
+    char key;  // To store the user input
     while (running) {
-        // Get user input without pressing Enter
-        char key = getKeyPress();
+        // Ask the user for input (with "Enter" required)
+        cout << "Enter command (WASD to move, Space to draw, Q to quit): ";
+        cin >> key;
 
         switch (key) {
             case 'w':  // Move cursor up
@@ -89,6 +76,9 @@ int main() {
             case ' ':  // Draw pixel at current cursor position
                 drawPixel(cursorX, cursorY);
                 break;
+            default:
+                cout << "Invalid command!" << endl;
+                continue;
         }
 
         // Clear the screen and redraw the grid with updated pixels
