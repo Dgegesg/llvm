@@ -225,7 +225,7 @@ int main() {
 
     // Add some labels
     ui.addLabel("Label 1", 2, 5);
-    ui.addLabel("Label 2", 6, 25);
+    ui.addLabel("Label 2", 2, 15);
 
     ui.run();
     return 0;
