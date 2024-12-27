@@ -29,12 +29,15 @@ void drawGrid(int cursorX, int cursorY) {
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
             if (x == cursorX && y == cursorY) {
-                cout << "\033[37mX\033[0m";  // Display the cursor at the current position in white
+                // Set red foreground with white background for the cursor 'X'
+                cout << "\033[31m\033[47mX\033[0m";  
             } else {
                 if (grid[y][x] == '*') {
-                    cout << "\033[37m*\033[0m";  // Display the drawn pixel in white
+                    // Draw pixel in white
+                    cout << "\033[37m*\033[0m";
                 } else {
-                    cout << "█";  // Display the empty space as a filled square
+                    // Display the empty space as a square block
+                    cout << "█"; 
                 }
             }
         }
