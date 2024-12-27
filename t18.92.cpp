@@ -206,18 +206,38 @@ private:
 
             // Check if the cursor is inside the button's bounds
             if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
-                cout << "\033[HButton '" << buttons[i] << "' pressed!" << endl;
+                executeButtonAction(i); // Execute corresponding action
                 return;
             }
         }
         cout << "\033[HNo button at the cursor position!" << endl;
+    }
+
+    // Execute actions for specific buttons based on index
+    void executeButtonAction(int index) {
+        switch (index) {
+            case 0:  // "Start"
+                cout << "\033[HStarting game..." << endl;
+                break;
+            case 1:  // "Options"
+                cout << "\033[HOpening options..." << endl;
+                break;
+            case 2:  // "Exit"
+                cout << "\033[HExiting..." << endl;
+                exit(0);
+                break;
+            default:
+                cout << "\033[HUnknown button action!" << endl;
+                break;
+        }
     }
 };
 
 // Main function to run the UI
 int main() {
     UI ui(WIDTH, HEIGHT);
-    
+
+    ui.addLabel("AUGUST XD", 6, 5);
     // Add some buttons
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
