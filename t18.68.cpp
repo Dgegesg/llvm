@@ -44,12 +44,12 @@ public:
         }
     }
 
-    // Renders the grid, now building it in memory to minimize flicker
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
-        string screen = ""; // Empty string to accumulate grid content
+    // Render background layer: grid borders, title, and empty spaces
+    string renderBackground() const {
+        string background = ""; 
 
         // Add the title at the top (above the grid)
-        screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
+        background += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
         
         // Render grid border and inside
         for (int y = 0; y < height; ++y) {
@@ -57,46 +57,66 @@ public:
                 // Draw grid corners with bold formatting
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
-                    screen += "\033[1m+\033[0m"; // Bold corners
+                    background += "\033[1m+\033[0m"; // Bold corners
                 }
                 // Bold horizontal edges
                 else if (y == 0 || y == height - 1) {
-                    screen += "\033[1m-\033[0m"; // Bold top and bottom edges
+                    background += "\033[1m-\033[0m"; // Bold top and bottom edges
                 }
                 // Bold vertical edges
                 else if (x == 0 || x == width - 1) {
-                    screen += "\033[1m|\033[0m"; // Bold left and right edges
+                    background += "\033[1m|\033[0m"; // Bold left and right edges
                 }
-                // Draw the cursor
-                else if (x == cursorX && y == cursorY) {
-                    screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
-                } else {
-                    bool buttonFound = false;
-                    // Check if we are on a button
-                    for (size_t i = 0; i < buttonPositions.size(); ++i) {
-                        if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
-                            buttonFound = true;
-                            // Highlight button when the cursor is over it
-                            if (cursorX == x && cursorY == y) {
-                                screen += BUTTON_COLOR + " " + buttons[i] + " \033[0m"; // Active button
-                            } else {
-                                screen += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m"; // Normal button
-                            }
-                            break;
-                        }
-                    }
-                    if (!buttonFound) {
-                        // Default empty space
-                        screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
-                    }
+                // Default empty space inside the grid
+                else {
+                    background += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
                 }
             }
-            screen += "\n"; // Add a new line after each row of the grid
+            background += "\n"; // Add a new line after each row of the grid
         }
-        return screen; // Return the built string of the UI
+        return background; // Return the built background layer
     }
 
-    // This method only clears the screen at the beginning (to avoid flicker during the loop)
+    // Render the button layer: draw the buttons on the grid
+    string renderButtons(const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, int cursorX, int cursorY) const {
+        string buttonLayer = "";
+
+        // Render button layer on top of the grid
+        for (size_t i = 0; i < buttonPositions.size(); ++i) {
+            int y = buttonPositions[i].first;
+            int x = buttonPositions[i].second;
+
+            // Highlight button when the cursor is over it
+            if (cursorX == x && cursorY == y) {
+                buttonLayer += BUTTON_COLOR + " " + buttons[i] + " \033[0m"; // Active button
+            } else {
+                buttonLayer += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m"; // Normal button
+            }
+        }
+        return buttonLayer; // Return the button layer
+    }
+
+    // Render the cursor layer: draw the cursor on top of the grid
+    string renderCursor(int cursorX, int cursorY) const {
+        string cursorLayer = "";
+        // Draw the cursor (on top of button or background)
+        cursorLayer += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
+        return cursorLayer;
+    }
+
+    // Combine all layers into a final screen output
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
+        string screen = renderBackground();  // Start with the background layer
+
+        // Now add the button layer (buttons will be rendered over the background)
+        screen += renderButtons(buttons, buttonPositions, cursorX, cursorY);
+
+        // Add the cursor layer on top of the buttons
+        screen += renderCursor(cursorX, cursorY);
+
+        return screen;
+    }
+
     void clear() const {
         cout << "\033[H\033[J"; // ANSI escape sequence to clear the screen (and move cursor to top-left)
     }
