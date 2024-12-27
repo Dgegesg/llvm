@@ -187,7 +187,7 @@ private:
     }
 
     void renderConsoleLogPage() {
-        string screen = grid.render(1, 1, {}, {}, consoleLog);  // Empty interactive grid for console log
+        string screen = grid.render(1, HEIGHT - MAX_LOG_LINES - 1, {}, {}, consoleLog);  // Console log rendered at the bottom
         cout << "\033[H" << screen << "Use 1 to switch back to Interactive Page\n";
     }
 
@@ -258,6 +258,7 @@ private:
     }
 };
 
+// Main function to run the UI
 int main() {
     UI ui(WIDTH, HEIGHT);
     
