@@ -73,17 +73,20 @@ public:
                     bool buttonFound = false;
                     // Check if we are on a button
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
-                        if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
+                        int buttonX = buttonPositions[i].second;
+                        int buttonY = buttonPositions[i].first;
+                        int buttonWidth = buttons[i].length() + 2; // button label width + padding around it
+
+                        // Check if cursor is within the bounds of the button (in the button area)
+                        if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
-                            int buttonWidth = buttons[i].length() + 2; // button label width + padding around it
+
                             // Highlight button when the cursor is over it
                             if (cursorX == x && cursorY == y) {
                                 screen += BUTTON_COLOR + " " + buttons[i] + " \033[0m"; // Active button
                             } else {
                                 screen += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m"; // Normal button
                             }
-                            // Skip the button width in the same row
-                            x += buttonWidth - 1;  // Adjust the x to skip the button width
                             break;
                         }
                     }
@@ -200,7 +203,12 @@ private:
     // Press a button under the cursor
     void pressButton(int x, int y) {
         for (size_t i = 0; i < buttonPositions.size(); ++i) {
-            if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
+            int buttonX = buttonPositions[i].second;
+            int buttonY = buttonPositions[i].first;
+            int buttonWidth = buttons[i].length() + 2; // button label width + padding around it
+
+            // Check if the cursor is inside the button's bounds
+            if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                 cout << "\033[HButton '" << buttons[i] << "' pressed!" << endl;
                 return;
             }
