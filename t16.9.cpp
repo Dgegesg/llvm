@@ -37,34 +37,35 @@ public:
 
     // Renders the grid, now building it in memory to minimize flicker
     string render(int cursorX, int cursorY) const {
-        string screen = "";
+        string screen = "\033[47m"; // Set the background color to white
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 // Draw grid borders and corners
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
-                    screen += "+"; // Corners
+                    screen += "\033[30m+"; // Corners with black color
                 }
                 else if (y == 0 || y == height - 1) {
-                    screen += "-"; // Top and bottom edges
+                    screen += "\033[30m-"; // Top and bottom edges with black color
                 }
                 else if (x == 0 || x == width - 1) {
-                    screen += "|"; // Left and right edges
+                    screen += "\033[30m|"; // Left and right edges with black color
                 }
                 // Draw the cursor
                 else if (x == cursorX && y == cursorY) {
-                    screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor
+                    screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
                 }
                 // Draw the pixels (optional, can be used to mark user actions)
                 else if (grid[y][x] == '*') {
                     screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    screen += " "; // Empty space
+                    screen += "\033[47m "; // Empty space with white background
                 }
             }
-            screen += "\n";
+            screen += "\n"; // Add a new line after each row of the grid
         }
-        return screen;
+        screen += "\033[0m"; // Reset the color settings after the grid
+        return screen; // Return the built string of the UI
     }
 
     void clear() {
@@ -88,10 +89,10 @@ public:
             string screen = grid.render(cursorX, cursorY);
 
             // Clear the terminal screen
-            grid.clear();
-            
+            grid.clear(); // Only clear the screen once per frame
+
             // Output the built screen at once to avoid flicker
-            cout << screen;
+            cout << screen; // Output the full screen content at once
 
             cout << "Use WASD to move, Q to quit: ";
             cin >> input;
@@ -125,16 +126,18 @@ private:
     Grid grid;
     int cursorX, cursorY;
 
+    // Custom sleep to avoid overloading CPU with tight loops
     void customSleep(int milliseconds) {
         auto start = chrono::steady_clock::now();
         while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
-            // Busy-wait loop to create delay
+            // Empty loop to simulate sleep
         }
     }
 };
 
+// Main function to run the UI
 int main() {
-    UI ui(WIDTH, HEIGHT); // Create UI with specific grid size
-    ui.run();  // Start the user interface
+    UI ui(WIDTH, HEIGHT);
+    ui.run();
     return 0;
 }
