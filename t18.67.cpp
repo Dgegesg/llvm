@@ -3,6 +3,7 @@
 #include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
+#include <iomanip>  // For std::setw
 
 using namespace std;
 
