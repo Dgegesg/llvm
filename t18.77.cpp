@@ -13,7 +13,7 @@ const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "My Custom UI"; // The title for the UI
 
 // ANSI color codes
-const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (change this to any color)
+const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
 const string BUTTON_COLOR = "\033[42m"; // Green background for the button (when cursor is over it)
 const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 
@@ -119,6 +119,7 @@ public:
     void addButton(string label, int row, int col) {
         // Check for existing button at the given position (to avoid duplicates)
         pair<int, int> buttonPos = {row, col};
+        
         // Ensure button is within the bounds of the grid (not on the border)
         if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
             buttons.push_back(label);
