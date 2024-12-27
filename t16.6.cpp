@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstdlib> // for system("clear") or system("cls")
+#include <cstdlib> // for system("clear")
 #include <chrono>  // for timing functions
 
 using namespace std;
@@ -25,6 +25,11 @@ void customSleep(int milliseconds) {
     while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
         // Empty loop; just waiting for the specified amount of time
     }
+}
+
+// Function to clear the screen (Linux-only)
+void clearScreen() {
+    system("clear");  // Clears the terminal screen on Linux
 }
 
 // Function to draw the grid in the terminal with borders and the cursor
@@ -81,6 +86,9 @@ int main() {
     char input;  // To store user input
 
     while (true) {
+        // Clear the screen before each update
+        clearScreen();
+        
         // Redraw the grid (UI elements can be added in this function)
         createUI();
         drawGrid(cursorX, cursorY);
