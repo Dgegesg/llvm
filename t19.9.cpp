@@ -98,17 +98,24 @@ public:
             screen += "\n"; // Add a new line after each row of the grid
         }
 
-        // Render console log at the bottom
-        screen += "\n" + CONSOLE_LOG_COLOR;
-        int linesToDisplay = min((int)consoleLog.size(), MAX_LOG_LINES);  // Display up to MAX_LOG_LINES
-        for (int i = consoleLog.size() - linesToDisplay; i < consoleLog.size(); ++i) {
-            string message = consoleLog[i];
-            if (message.length() > WIDTH - 2) { // Cut long messages
-                message = message.substr(0, WIDTH - 2);
+        // Render console log inside the bottom border
+        if (!consoleLog.empty()) {
+            int linesToDisplay = min((int)consoleLog.size(), MAX_LOG_LINES);  // Display up to MAX_LOG_LINES
+            int startY = HEIGHT - linesToDisplay - 1;
+
+            screen += "\n" + CONSOLE_LOG_COLOR;
+            for (int i = startY; i < HEIGHT - 1; ++i) {
+                if (i < consoleLog.size()) {
+                    string message = consoleLog[i];
+                    if (message.length() > WIDTH - 2) { // Cut long messages
+                        message = message.substr(0, WIDTH - 2);
+                    }
+                    screen += "\n" + message;
+                }
             }
-            screen += "\n" + message;
+            screen += "\033[0m"; // Reset color after displaying log
         }
-        screen += "\033[0m"; // Reset color after displaying log
+
         return screen; // Return the built string of the UI
     }
 
