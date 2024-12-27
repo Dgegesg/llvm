@@ -46,16 +46,18 @@ public:
         // Render grid border and inside
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
-                // Draw grid corners without color
+                // Draw grid corners with bold formatting
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
-                    screen += "+"; // Corners without color
+                    screen += "\033[1m+\033[0m"; // Bold corners
                 }
+                // Bold horizontal edges
                 else if (y == 0 || y == height - 1) {
-                    screen += "-"; // Top and bottom edges without color
+                    screen += "\033[1m-\033[0m"; // Bold top and bottom edges
                 }
+                // Bold vertical edges
                 else if (x == 0 || x == width - 1) {
-                    screen += "|"; // Left and right edges without color
+                    screen += "\033[1m|\033[0m"; // Bold left and right edges
                 }
                 // Draw the cursor
                 else if (x == cursorX && y == cursorY) {
@@ -65,7 +67,7 @@ public:
                 else if (grid[y][x] == '*') {
                     screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    screen += "\033[47m "; // Empty space with white background
+                    screen += "\033[47m \033[0m"; // Empty space with white background
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
