@@ -67,7 +67,8 @@ public:
                 else if (grid[y][x] == '*') {
                     screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    screen += "\033[47m \033[0m"; // Empty space with white background
+                    // Apply white background only for the inner space, not for borders
+                    screen += " "; // Empty space with no background (for border areas)
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
