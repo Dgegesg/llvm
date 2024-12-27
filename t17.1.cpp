@@ -8,6 +8,7 @@ const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
+const string TITLE = "My Custom UI"; // The title for the UI
 
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
@@ -38,6 +39,11 @@ public:
     // Renders the grid, now building it in memory to minimize flicker
     string render(int cursorX, int cursorY) const {
         string screen = ""; // Empty string to accumulate grid content
+
+        // Add the title at the top (above the grid)
+        screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
+        
+        // Render grid border and inside
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 // Draw grid corners without color
@@ -59,7 +65,7 @@ public:
                 else if (grid[y][x] == '*') {
                     screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    screen += "\033[47m \033[0m"; // Empty space with white background
+                    screen += "\033[47m "; // Empty space with white background
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
