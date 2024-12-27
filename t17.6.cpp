@@ -10,6 +10,10 @@ const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "My Custom UI"; // The title for the UI
 
+// ANSI color codes
+const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (change this to any color)
+
+
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
 public:
@@ -67,8 +71,8 @@ public:
                 else if (grid[y][x] == '*') {
                     screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    // Apply white background only for the inner space, not for borders
-                    screen += " "; // Empty space with no background (for border areas)
+                    // Apply color to the empty space
+                    screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
