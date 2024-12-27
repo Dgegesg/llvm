@@ -16,7 +16,7 @@ void initGrid() {
     }
 }
 
-// Function to draw the grid with rounded corners and edges
+// Function to draw the grid in the terminal with corners, edges, and cursor
 void drawGrid(int cursorX, int cursorY) {
     // Clear the terminal screen (platform-specific)
     #ifdef _WIN32
@@ -27,29 +27,18 @@ void drawGrid(int cursorX, int cursorY) {
     
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
-            // Draw top-left corner
-            if (x == 0 && y == 0) {
-                cout << "╭";  // Top-left corner
-            }
-            // Draw top-right corner
-            else if (x == WIDTH - 1 && y == 0) {
-                cout << "╮";  // Top-right corner
-            }
-            // Draw bottom-left corner
-            else if (x == 0 && y == HEIGHT - 1) {
-                cout << "╰";  // Bottom-left corner
-            }
-            // Draw bottom-right corner
-            else if (x == WIDTH - 1 && y == HEIGHT - 1) {
-                cout << "╯";  // Bottom-right corner
+            // Draw corners
+            if ((x == 0 && y == 0) || (x == WIDTH - 1 && y == 0) || 
+                (x == 0 && y == HEIGHT - 1) || (x == WIDTH - 1 && y == HEIGHT - 1)) {
+                cout << "+";  // Top-left, top-right, bottom-left, bottom-right corners
             }
             // Draw horizontal edges (excluding corners)
             else if (y == 0 || y == HEIGHT - 1) {
-                cout << "─";  // Top and bottom edges
+                cout << "-";  // Top and bottom edges
             }
             // Draw vertical edges (excluding corners)
             else if (x == 0 || x == WIDTH - 1) {
-                cout << "│";  // Left and right edges
+                cout << "|";  // Left and right edges
             }
             // Draw the cursor at the current position
             else if (x == cursorX && y == cursorY) {
