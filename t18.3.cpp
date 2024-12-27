@@ -42,14 +42,14 @@ public:
     }
 
     // Renders the grid, now building it in memory to minimize flicker
-    string render(int cursorX, int cursorY) const {
+    string render(int cursorX, int cursorY, int selectedMenuOption, const vector<string>& menuOptions) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
         
         // Render grid border and inside
-        for (int y = 0; y < height; ++y) {
+        for (int y = 0; y < height - 3; ++y) {  // Leave space for the menu at the bottom
             for (int x = 0; x < width; ++x) {
                 // Draw grid corners with bold formatting
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
@@ -64,7 +64,7 @@ public:
                 else if (x == 0 || x == width - 1) {
                     screen += "\033[1m|\033[0m"; // Bold left and right edges
                 }
-                // Draw the cursor
+                // Draw the cursor inside the grid
                 else if (x == cursorX && y == cursorY) {
                     screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
                 }
@@ -78,6 +78,17 @@ public:
             }
             screen += "\n"; // Add a new line after each row of the grid
         }
+
+        // Render the menu at the bottom
+        for (int i = 0; i < menuOptions.size(); ++i) {
+            // Highlight the selected option
+            if (i == selectedMenuOption) {
+                screen += "> " + menuOptions[i] + "\n"; // Add a '>' to indicate selection
+            } else {
+                screen += "  " + menuOptions[i] + "\n"; // Regular menu options
+            }
+        }
+
         return screen; // Return the built string of the UI
     }
 
@@ -107,19 +118,7 @@ public:
 
         while (true) {
             // Build the UI screen in memory to minimize flickering
-            string screen = grid.render(cursorX, cursorY);
-
-            // Add menu rendering
-            screen += "\nUse WASD to move, Enter to select, Q to quit.\n";
-
-            // Display the menu with the cursor position
-            for (int i = 0; i < menuOptions.size(); ++i) {
-                if (i == selectedMenuOption) {
-                    screen += "> " + menuOptions[i] + "\n"; // Highlight the selected option
-                } else {
-                    screen += "  " + menuOptions[i] + "\n";
-                }
-            }
+            string screen = grid.render(cursorX, cursorY, selectedMenuOption, menuOptions);
 
             // Move the cursor to the top left of the screen, then output the content
             cout << "\033[H"; // Move cursor to top left
