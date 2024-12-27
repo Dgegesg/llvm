@@ -217,27 +217,31 @@ private:
     void executeButtonAction(int index) {
         switch (index) {
             case 0:  // "Start"
-                cout << "\033[HStarting game..." << endl;
+                consoleEcho("Starting game...");
                 break;
             case 1:  // "Options"
-                cout << "\033[HOpening options..." << endl;
+                consoleEcho("Opening options...");
                 break;
             case 2:  // "Exit"
-                cout << "\033[HExiting..." << endl;
+                consoleEcho("Exiting...");
                 exit(0);
                 break;
             default:
-                cout << "\033[HUnknown button action!" << endl;
+                consoleEcho("Unknown button action!");
                 break;
         }
+    }
+
+    // Function to echo messages to the console
+    void consoleEcho(const string& message) {
+        cout << "\033[H" << message << endl;
     }
 };
 
 // Main function to run the UI
 int main() {
     UI ui(WIDTH, HEIGHT);
-
-    ui.addLabel("AUGUST XD", 6, 5);
+    
     // Add some buttons
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
