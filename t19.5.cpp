@@ -46,7 +46,7 @@ public:
     }
 
     // Renders the grid
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, const vector<string>& consoleLog) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
@@ -97,6 +97,18 @@ public:
             }
             screen += "\n"; // Add a new line after each row of the grid
         }
+
+        // Render console log at the bottom
+        screen += "\n" + CONSOLE_LOG_COLOR;
+        int linesToDisplay = min((int)consoleLog.size(), MAX_LOG_LINES);  // Display up to MAX_LOG_LINES
+        for (int i = consoleLog.size() - linesToDisplay; i < consoleLog.size(); ++i) {
+            string message = consoleLog[i];
+            if (message.length() > WIDTH - 2) { // Cut long messages
+                message = message.substr(0, WIDTH - 2);
+            }
+            screen += "\n" + message;
+        }
+        screen += "\033[0m"; // Reset color after displaying log
         return screen; // Return the built string of the UI
     }
 
@@ -170,22 +182,12 @@ private:
     const int MAX_LOG_LINES = 8;
 
     void renderInteractivePage() {
-        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions);
+        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, {});
         cout << "\033[H" << screen << "Use WASD to move, E to press, 2 to switch to Console Log Page\n";
     }
 
     void renderConsoleLogPage() {
-        string screen = grid.render(1, 1, {}, {});  // Empty interactive grid for console log
-        screen = CONSOLE_LOG_COLOR; // Set background color for console log
-        int linesToDisplay = min((int)consoleLog.size(), MAX_LOG_LINES);  // Display up to MAX_LOG_LINES
-        for (int i = consoleLog.size() - linesToDisplay; i < consoleLog.size(); ++i) {
-            string message = consoleLog[i];
-            if (message.length() > WIDTH - 2) { // Cut long messages
-                message = message.substr(0, WIDTH - 2);
-            }
-            screen += "\n" + message;
-        }
-        screen += "\033[0m"; // Reset color after displaying log
+        string screen = grid.render(1, 1, {}, {}, consoleLog);  // Empty interactive grid for console log
         cout << "\033[H" << screen << "Use 1 to switch back to Interactive Page\n";
     }
 
