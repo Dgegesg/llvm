@@ -17,7 +17,6 @@ const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space 
 const string BUTTON_COLOR = "\033[42m"; // Green background for the button (when cursor is over it)
 const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 
-
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
 public:
@@ -74,12 +73,7 @@ public:
                     bool buttonFound = false;
                     // Check if we are on a button
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
-                        int buttonRow = buttonPositions[i].first;
-                        int buttonCol = buttonPositions[i].second;
-                        int buttonLength = buttons[i].length();
-                        
-                        // Only render the button's space, avoiding overlap with borders
-                        if (buttonRow == y && buttonCol >= x && buttonCol < x + buttonLength) {
+                        if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
                             buttonFound = true;
                             // Highlight button when the cursor is over it
                             if (cursorX == x && cursorY == y) {
@@ -117,8 +111,13 @@ public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void addButton(string label, int row, int col) {
-        buttons.push_back(label);
-        buttonPositions.push_back({row, col});
+        // Ensure button is within the bounds of the grid (not on the border)
+        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+            buttons.push_back(label);
+            buttonPositions.push_back({row, col});
+        } else {
+            cout << "Button '" << label << "' cannot be placed on the border!" << endl;
+        }
     }
 
     void run() {
