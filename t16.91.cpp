@@ -40,10 +40,10 @@ public:
         string screen = "\033[47m"; // Set the background color to white
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
-                // Draw grid borders and corners
+                // Draw grid corners without color
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
-                    screen += "\033[30m+"; // Corners with black color
+                    screen += "+"; // Corners without color
                 }
                 else if (y == 0 || y == height - 1) {
                     screen += "\033[30m-"; // Top and bottom edges with black color
