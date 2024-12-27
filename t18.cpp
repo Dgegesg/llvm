@@ -8,7 +8,7 @@ const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
-const string TITLE = "My Custom UI"; // The title for the UI
+const string TITLE = "V18 August UI"; // The title for the UI
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (change this to any color)
@@ -158,7 +158,7 @@ private:
                 }
                 // Display the loading dots without clearing the screen
                 cout << "\033[HLoading" + dots << flush;
-                customSleep(500); // Delay for 500 milliseconds
+                customSleep(100); // Delay for 500 milliseconds
             }
         }
     }
