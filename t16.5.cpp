@@ -8,12 +8,6 @@ const int WIDTH = 40;  // Width of the screen (number of "pixels")
 const int HEIGHT = 10; // Height of the screen (number of "pixels")
 char grid[HEIGHT][WIDTH]; // The pixel grid
 
-// Button's location and size
-const int BUTTON_X = 5;
-const int BUTTON_Y = 4;
-const int BUTTON_WIDTH = 6;
-const int BUTTON_HEIGHT = 2;
-
 // Function to initialize the grid with empty spaces
 void initGrid() {
     for (int y = 0; y < HEIGHT; ++y) {
@@ -33,7 +27,7 @@ void customSleep(int milliseconds) {
     }
 }
 
-// Function to draw the grid in the terminal with corners, edges, and cursor
+// Function to draw the grid in the terminal with borders and the cursor
 void drawGrid(int cursorX, int cursorY) {
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
@@ -50,13 +44,6 @@ void drawGrid(int cursorX, int cursorY) {
             else if (x == 0 || x == WIDTH - 1) {
                 cout << "|";  // Left and right edges
             }
-            // Draw the button (a rectangular area)
-            else if (x >= BUTTON_X && x <= BUTTON_X + BUTTON_WIDTH - 1 && y >= BUTTON_Y && y <= BUTTON_Y + BUTTON_HEIGHT - 1) {
-                if (x == BUTTON_X || x == BUTTON_X + BUTTON_WIDTH - 1 || y == BUTTON_Y || y == BUTTON_Y + BUTTON_HEIGHT - 1)
-                    cout << "#"; // Border of the button
-                else
-                    cout << " "; // Inside of the button
-            }
             // Draw the cursor at the current position
             else if (x == cursorX && y == cursorY) {
                 cout << "\033[31m\033[47mX\033[0m";  // Red text with white background for the cursor
@@ -72,13 +59,20 @@ void drawGrid(int cursorX, int cursorY) {
     }
 }
 
-// Function to check if the cursor is inside the button area
-bool isButtonPressed(int cursorX, int cursorY) {
-    return (cursorX >= BUTTON_X && cursorX <= BUTTON_X + BUTTON_WIDTH - 1 &&
-            cursorY >= BUTTON_Y && cursorY <= BUTTON_Y + BUTTON_HEIGHT - 1);
+// Function to check if the cursor is inside any designated UI element (optional)
+bool isInsideUIElement(int cursorX, int cursorY, int xStart, int yStart, int xEnd, int yEnd) {
+    return (cursorX >= xStart && cursorX <= xEnd && cursorY >= yStart && cursorY <= yEnd);
 }
 
-// Main function
+// Custom function to create the UI layout
+void createUI() {
+    // Placeholder for custom UI components
+    // You can add various UI elements such as buttons, text, etc.
+
+    // For now, we're just showing a grid with borders
+    // You can extend this to create custom UI elements like buttons, labels, etc.
+}
+
 int main() {
     // Initialize the grid with empty pixels
     initGrid();
@@ -87,10 +81,11 @@ int main() {
     char input;  // To store user input
 
     while (true) {
-        // Instead of clearing the screen, we only redraw the grid after changes
+        // Redraw the grid (UI elements can be added in this function)
+        createUI();
         drawGrid(cursorX, cursorY);
 
-        cout << "Use WASD to move, Enter to press button, Q to quit: ";
+        cout << "Use WASD to move, Q to quit: ";
         cin >> input;
 
         switch (input) {
@@ -105,13 +100,6 @@ int main() {
                 break;
             case 'd':  // Move cursor right
                 if (cursorX < WIDTH - 2) cursorX++;  // Prevent cursor from going outside the right border
-                break;
-            case 13:  // Enter key pressed (to simulate button press)
-                if (isButtonPressed(cursorX, cursorY)) {
-                    cout << "Button Pressed!" << endl;
-                } else {
-                    cout << "Press the button area!" << endl;
-                }
                 break;
             case 'q':  // Quit the program
                 cout << "Exiting..." << endl;
