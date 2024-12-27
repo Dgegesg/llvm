@@ -15,6 +15,7 @@ const string TITLE = "Custom Console UI"; // The title for the UI
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
 const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 const string CURSOR_COLOR = "\033[31m\033[47m"; // Red cursor with white background
+const string CONSOLE_LOG_COLOR = "\033[42m"; // Green background for console log grid
 
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
@@ -166,7 +167,9 @@ private:
     }
 
     void renderConsoleLogPage() {
-        cout << "\033[H" << "Console Log Page - No interactive elements here." << endl;
+        string screen = grid.render(1, 1, {}, {});  // Empty interactive grid for console log
+        screen = CONSOLE_LOG_COLOR + screen + "\033[0m"; // Green background for console log
+        cout << "\033[H" << screen << "Use 1 to switch back to Interactive Page\n";
     }
 
     void handleInput(char input) {
