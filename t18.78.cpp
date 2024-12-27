@@ -3,6 +3,7 @@
 #include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
+#include <algorithm>  // For std::find
 
 using namespace std;
 
@@ -117,13 +118,18 @@ public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void addButton(string label, int row, int col) {
-        // Check for existing button at the given position (to avoid duplicates)
-        pair<int, int> buttonPos = {row, col};
-        
+        // Ensure that no button is added at the same position (prevent duplicates)
+        for (const auto& pos : buttonPositions) {
+            if (pos.first == row && pos.second == col) {
+                cout << "Button at position (" << row << ", " << col << ") already exists!" << endl;
+                return; // Skip adding the button if it already exists at that position
+            }
+        }
+
         // Ensure button is within the bounds of the grid (not on the border)
         if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
             buttons.push_back(label);
-            buttonPositions.push_back(buttonPos);  // Track added position
+            buttonPositions.push_back({row, col});  // Track the position of the added button
         } else {
             cout << "Button '" << label << "' cannot be placed on the border!" << endl;
         }
