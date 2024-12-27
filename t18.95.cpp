@@ -9,7 +9,7 @@ const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
-const string TITLE = "My Custom UI"; // The title for the UI
+const string TITLE = "Console Interaction UI"; // The title for the UI
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
@@ -248,9 +248,9 @@ int main() {
     ui.addButton("Exit", 5, 10);
 
     // Add some labels
-    ui.addLabel("Label1", 6, 5);  // Ensure unique column for each label
-    ui.addLabel("Label2", 7, 5);  // New line automatically
-    ui.addLabel("Label3", 8, 5);  // Continuing in the next row
+    ui.addLabel("Label1", 6, 5);  // Auto new line for labels
+    ui.addLabel("Label2", 7, 5);
+    ui.addLabel("Label3", 8, 5);
 
     ui.run();
     return 0;
