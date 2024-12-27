@@ -152,12 +152,12 @@ private:
     void showLoadingAnimation() {
         for (int i = 0; i < 5; ++i) {
             for (int j = 0; j < 4; ++j) {
-                cout << "\033[HLoading";
                 string dots = "";
                 for (int dotCount = 0; dotCount < j; ++dotCount) {
                     dots += ".";
                 }
-                cout << dots << flush;
+                // Display the loading dots without clearing the screen
+                cout << "\033[HLoading" + dots << flush;
                 customSleep(500); // Delay for 500 milliseconds
             }
         }
