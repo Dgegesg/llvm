@@ -97,6 +97,7 @@ public:
 
     void run() {
         grid.clear(); // Clear screen at the start
+        showLoadingAnimation(); // Show loading animation before UI starts
 
         char input;
         while (true) {
@@ -144,6 +145,21 @@ private:
         auto start = chrono::steady_clock::now();
         while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
             // Empty loop to simulate sleep
+        }
+    }
+
+    // Show loading animation before the UI starts
+    void showLoadingAnimation() {
+        for (int i = 0; i < 5; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                cout << "\033[HLoading";
+                string dots = "";
+                for (int dotCount = 0; dotCount < j; ++dotCount) {
+                    dots += ".";
+                }
+                cout << dots << flush;
+                customSleep(500); // Delay for 500 milliseconds
+            }
         }
     }
 };
