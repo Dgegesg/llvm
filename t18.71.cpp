@@ -49,7 +49,7 @@ public:
 
         // Add the title at the top (above the grid)
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
-        
+
         // Render grid border and inside
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
