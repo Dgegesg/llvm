@@ -8,6 +8,12 @@ const int WIDTH = 20;  // Width of the screen (number of "pixels")
 const int HEIGHT = 10; // Height of the screen (number of "pixels")
 char grid[HEIGHT][WIDTH]; // The pixel grid
 
+// Button's location and size
+const int BUTTON_X = 5;
+const int BUTTON_Y = 4;
+const int BUTTON_WIDTH = 6;
+const int BUTTON_HEIGHT = 2;
+
 // Function to initialize the grid with empty spaces
 void initGrid() {
     for (int y = 0; y < HEIGHT; ++y) {
@@ -52,8 +58,8 @@ void drawGrid(int cursorX, int cursorY) {
                 cout << "|";  // Left and right edges
             }
             // Draw the button (a rectangular area)
-            else if (x >= 5 && x <= 10 && y >= 4 && y <= 5) {
-                if (x == 5 || x == 10 || y == 4 || y == 5)
+            else if (x >= BUTTON_X && x <= BUTTON_X + BUTTON_WIDTH - 1 && y >= BUTTON_Y && y <= BUTTON_Y + BUTTON_HEIGHT - 1) {
+                if (x == BUTTON_X || x == BUTTON_X + BUTTON_WIDTH - 1 || y == BUTTON_Y || y == BUTTON_Y + BUTTON_HEIGHT - 1)
                     cout << "#"; // Border of the button
                 else
                     cout << " "; // Inside of the button
@@ -73,19 +79,10 @@ void drawGrid(int cursorX, int cursorY) {
     }
 }
 
-// Function to draw a pixel at the current cursor position
-void drawPixel(int cursorX, int cursorY) {
-    if (cursorX >= 0 && cursorX < WIDTH && cursorY >= 0 && cursorY < HEIGHT) {
-        grid[cursorY][cursorX] = '*';  // Set the current grid position to a drawn pixel
-    }
-}
-
-// Function to handle the button press action
-void handleButtonPress(int cursorX, int cursorY) {
-    // Check if the cursor is inside the button area
-    if (cursorX >= 5 && cursorX <= 10 && cursorY >= 4 && cursorY <= 5) {
-        cout << "Button Pressed!" << endl;
-    }
+// Function to check if the cursor is inside the button area
+bool isButtonPressed(int cursorX, int cursorY) {
+    return (cursorX >= BUTTON_X && cursorX <= BUTTON_X + BUTTON_WIDTH - 1 &&
+            cursorY >= BUTTON_Y && cursorY <= BUTTON_Y + BUTTON_HEIGHT - 1);
 }
 
 // Main function
@@ -100,7 +97,7 @@ int main() {
         // Draw the grid with the cursor in the correct position
         drawGrid(cursorX, cursorY);
         
-        cout << "Use WASD to move, Space to draw, Enter to press button, Q to quit: ";
+        cout << "Use WASD to move, Enter to press button, Q to quit: ";
         cin >> input;
 
         switch (input) {
@@ -116,11 +113,12 @@ int main() {
             case 'd':  // Move cursor right
                 if (cursorX < WIDTH - 2) cursorX++;  // Prevent cursor from going outside the right border
                 break;
-            case ' ':  // Draw pixel at current cursor position
-                drawPixel(cursorX, cursorY);
-                break;
-            case 13:  // Enter key pressed
-                handleButtonPress(cursorX, cursorY);  // Check if the button area was pressed
+            case 13:  // Enter key pressed (to simulate button press)
+                if (isButtonPressed(cursorX, cursorY)) {
+                    cout << "Button Pressed!" << endl;
+                } else {
+                    cout << "Press the button area!" << endl;
+                }
                 break;
             case 'q':  // Quit the program
                 cout << "Exiting..." << endl;
