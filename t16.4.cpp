@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int WIDTH = 20;  // Width of the screen (number of "pixels")
+const int WIDTH = 40;  // Width of the screen (number of "pixels")
 const int HEIGHT = 10; // Height of the screen (number of "pixels")
 char grid[HEIGHT][WIDTH]; // The pixel grid
 
@@ -35,13 +35,6 @@ void customSleep(int milliseconds) {
 
 // Function to draw the grid in the terminal with corners, edges, and cursor
 void drawGrid(int cursorX, int cursorY) {
-    // Clear the terminal screen (platform-specific)
-    #ifdef _WIN32
-        system("cls"); // Windows command to clear the screen
-    #else
-        system("clear"); // Unix/Linux/Mac command to clear the screen
-    #endif
-    
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
             // Draw corners
@@ -94,9 +87,9 @@ int main() {
     char input;  // To store user input
 
     while (true) {
-        // Draw the grid with the cursor in the correct position
+        // Instead of clearing the screen, we only redraw the grid after changes
         drawGrid(cursorX, cursorY);
-        
+
         cout << "Use WASD to move, Enter to press button, Q to quit: ";
         cin >> input;
 
