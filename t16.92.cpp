@@ -37,7 +37,7 @@ public:
 
     // Renders the grid, now building it in memory to minimize flicker
     string render(int cursorX, int cursorY) const {
-        string screen = "\033[47m"; // Set the background color to white
+        string screen = ""; // Empty string to accumulate grid content
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 // Draw grid corners without color
@@ -46,10 +46,10 @@ public:
                     screen += "+"; // Corners without color
                 }
                 else if (y == 0 || y == height - 1) {
-                    screen += "\033[30m-"; // Top and bottom edges with black color
+                    screen += "-"; // Top and bottom edges without color
                 }
                 else if (x == 0 || x == width - 1) {
-                    screen += "\033[30m|"; // Left and right edges with black color
+                    screen += "|"; // Left and right edges without color
                 }
                 // Draw the cursor
                 else if (x == cursorX && y == cursorY) {
@@ -64,7 +64,6 @@ public:
             }
             screen += "\n"; // Add a new line after each row of the grid
         }
-        screen += "\033[0m"; // Reset the color settings after the grid
         return screen; // Return the built string of the UI
     }
 
