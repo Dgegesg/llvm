@@ -258,7 +258,6 @@ private:
     }
 };
 
-// Main function to run the UI
 int main() {
     UI ui(WIDTH, HEIGHT);
     
