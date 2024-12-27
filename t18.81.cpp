@@ -3,7 +3,6 @@
 #include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
-#include <set>
 
 using namespace std;
 
@@ -44,6 +43,7 @@ public:
         }
     }
 
+    // Renders the grid, now building it in memory to minimize flicker
     string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
         string screen = ""; // Empty string to accumulate grid content
 
@@ -53,41 +53,55 @@ public:
         // Render grid border and inside
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
-                if ((x == 0 && y == 0) || (x == width - 1 && y == 0) ||
+                // Draw grid corners with bold formatting
+                if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
                     screen += "\033[1m+\033[0m"; // Bold corners
-                } else if (y == 0 || y == height - 1) {
+                }
+                // Bold horizontal edges
+                else if (y == 0 || y == height - 1) {
                     screen += "\033[1m-\033[0m"; // Bold top and bottom edges
-                } else if (x == 0 || x == width - 1) {
+                }
+                // Bold vertical edges
+                else if (x == 0 || x == width - 1) {
                     screen += "\033[1m|\033[0m"; // Bold left and right edges
-                } else if (x == cursorX && y == cursorY) {
+                }
+                // Draw the cursor
+                else if (x == cursorX && y == cursorY) {
                     screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
                 } else {
                     bool buttonFound = false;
+                    // Check if we are on a button
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
                         int buttonX = buttonPositions[i].second;
                         int buttonY = buttonPositions[i].first;
-                        int buttonWidth = buttons[i].length() + 2;
+                        int buttonWidth = buttons[i].length() + 2; // Button width (padding around it)
 
+                        // Check if cursor is within the bounds of the button (button area)
                         if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
-                            if (x == buttonX) {
-                                // Render the button text only once
-                                screen += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m";
+
+                            // Highlight button when the cursor is over it
+                            if (cursorX == x && cursorY == y) {
+                                screen += BUTTON_COLOR + " " + buttons[i] + " \033[0m"; // Active button
+                            } else {
+                                screen += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m"; // Normal button
                             }
                             break;
                         }
                     }
                     if (!buttonFound) {
-                        screen += EMPTY_SPACE_COLOR + " \033[0m";
+                        // Default empty space
+                        screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
                     }
                 }
             }
-            screen += "\n";
+            screen += "\n"; // Add a new line after each row of the grid
         }
-        return screen;
+        return screen; // Return the built string of the UI
     }
 
+    // This method only clears the screen at the beginning (to avoid flicker during the loop)
     void clear() const {
         cout << "\033[H\033[J"; // ANSI escape sequence to clear the screen (and move cursor to top-left)
     }
@@ -97,54 +111,57 @@ private:
     char** grid;
 };
 
+// UI class to handle user input and cursor movements
 class UI {
 public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void addButton(string label, int row, int col) {
+        // Check for existing button at the given position (to avoid duplicates)
         pair<int, int> buttonPos = {row, col};
-
-        // Prevent duplicate buttons
-        if (buttonLabels.find(label) == buttonLabels.end()) {
-            if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-                buttons.push_back(label);
-                buttonPositions.push_back(buttonPos);
-                buttonLabels.insert(label);
-            } else {
-                cout << "Button '" << label << "' cannot be placed on the border!" << endl;
-            }
+        
+        // Ensure button is within the bounds of the grid (not on the border)
+        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+            buttons.push_back(label);
+            buttonPositions.push_back(buttonPos);  // Track added position
+        } else {
+            cout << "Button '" << label << "' cannot be placed on the border!" << endl;
         }
     }
 
     void run() {
-        grid.clear();
-        showLoadingAnimation();
+        grid.clear(); // Clear screen at the start
+        showLoadingAnimation(); // Show loading animation before UI starts
 
         char input;
         while (true) {
+            // Build the UI screen in memory to minimize flickering
             string screen = grid.render(cursorX, cursorY, buttons, buttonPositions);
-            cout << "\033[H" << screen;
+
+            // Move the cursor to the top left of the screen, then output the content
+            cout << "\033[H"; // Move cursor to top left
+            cout << screen; // Output the built screen at once
 
             cout << "Use WASD to move, E to press, Q to quit: ";
             cin >> input;
 
             switch (input) {
-                case 'w':
+                case 'w':  // Move cursor up
                     if (cursorY > 1) cursorY--;
                     break;
-                case 's':
+                case 's':  // Move cursor down
                     if (cursorY < HEIGHT - 2) cursorY++;
                     break;
-                case 'a':
+                case 'a':  // Move cursor left
                     if (cursorX > 1) cursorX--;
                     break;
-                case 'd':
+                case 'd':  // Move cursor right
                     if (cursorX < WIDTH - 2) cursorX++;
                     break;
-                case 'e':
+                case 'e':  // Press button under cursor
                     pressButton(cursorX, cursorY);
                     break;
-                case 'q':
+                case 'q':  // Quit the program
                     cout << "Exiting..." << endl;
                     return;
                 default:
@@ -152,38 +169,48 @@ public:
                     break;
             }
 
-            customSleep(100);
+            customSleep(100); // Delay for 100 milliseconds
         }
     }
 
 private:
     Grid grid;
     int cursorX, cursorY;
-    vector<string> buttons;
-    vector<pair<int, int>> buttonPositions;
-    set<string> buttonLabels;
+    vector<string> buttons;  // Button labels
+    vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
 
+    // Custom sleep using a busy-wait loop (fallback)
     void customSleep(int milliseconds) {
         auto start = chrono::steady_clock::now();
         while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
+            // Minimal CPU usage, no-op
         }
     }
 
+    // Show loading animation before the UI starts
     void showLoadingAnimation() {
         for (int i = 0; i < 5; ++i) {
-            string dots = string(i % 4, '.');
-            grid.clear();
-            cout << "\033[HLoading" + dots << flush;
-            customSleep(500);
+            for (int j = 0; j < 4; ++j) {
+                string dots = "";
+                for (int dotCount = 0; dotCount < j; ++dotCount) {
+                    dots += ".";
+                }
+                // Clear the screen before displaying the loading dots
+                grid.clear();
+                cout << "\033[HLoading" + dots << flush;
+                customSleep(500); // Delay for 500 milliseconds
+            }
         }
     }
 
+    // Press a button under the cursor
     void pressButton(int x, int y) {
         for (size_t i = 0; i < buttonPositions.size(); ++i) {
             int buttonX = buttonPositions[i].second;
             int buttonY = buttonPositions[i].first;
-            int buttonWidth = buttons[i].length() + 2;
+            int buttonWidth = buttons[i].length() + 2; // Button label width + padding around it
 
+            // Check if the cursor is inside the button's bounds
             if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                 cout << "\033[HButton '" << buttons[i] << "' pressed!" << endl;
                 return;
@@ -193,9 +220,11 @@ private:
     }
 };
 
+// Main function to run the UI
 int main() {
     UI ui(WIDTH, HEIGHT);
-
+    
+    // Add some buttons
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
     ui.addButton("Exit", 5, 10);
