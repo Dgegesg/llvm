@@ -113,7 +113,7 @@ int main() {
         }
 
         // Adding a small delay to make the UI feel smoother and reduce flicker
-        customSleep(100); // Delay for 100 milliseconds to make the interface more responsive
+        customSleep(0); // Delay for 100 milliseconds to make the interface more responsive
     }
 
     return 0;
