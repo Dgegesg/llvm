@@ -51,6 +51,13 @@ void drawGrid(int cursorX, int cursorY) {
             else if (x == 0 || x == WIDTH - 1) {
                 cout << "|";  // Left and right edges
             }
+            // Draw the button (a rectangular area)
+            else if (x >= 5 && x <= 10 && y >= 4 && y <= 5) {
+                if (x == 5 || x == 10 || y == 4 || y == 5)
+                    cout << "#"; // Border of the button
+                else
+                    cout << " "; // Inside of the button
+            }
             // Draw the cursor at the current position
             else if (x == cursorX && y == cursorY) {
                 cout << "\033[31m\033[47mX\033[0m";  // Red text with white background for the cursor
@@ -73,6 +80,14 @@ void drawPixel(int cursorX, int cursorY) {
     }
 }
 
+// Function to handle the button press action
+void handleButtonPress(int cursorX, int cursorY) {
+    // Check if the cursor is inside the button area
+    if (cursorX >= 5 && cursorX <= 10 && cursorY >= 4 && cursorY <= 5) {
+        cout << "Button Pressed!" << endl;
+    }
+}
+
 // Main function
 int main() {
     // Initialize the grid with empty pixels
@@ -85,7 +100,7 @@ int main() {
         // Draw the grid with the cursor in the correct position
         drawGrid(cursorX, cursorY);
         
-        cout << "Use WASD to move, Space to draw, Q to quit: ";
+        cout << "Use WASD to move, Space to draw, Enter to press button, Q to quit: ";
         cin >> input;
 
         switch (input) {
@@ -104,6 +119,9 @@ int main() {
             case ' ':  // Draw pixel at current cursor position
                 drawPixel(cursorX, cursorY);
                 break;
+            case 13:  // Enter key pressed
+                handleButtonPress(cursorX, cursorY);  // Check if the button area was pressed
+                break;
             case 'q':  // Quit the program
                 cout << "Exiting..." << endl;
                 return 0;
@@ -113,7 +131,7 @@ int main() {
         }
 
         // Adding a small delay to make the UI feel smoother and reduce flicker
-        customSleep(0); // Delay for 100 milliseconds to make the interface more responsive
+        customSleep(100); // Delay for 100 milliseconds to make the interface more responsive
     }
 
     return 0;
