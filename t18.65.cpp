@@ -77,6 +77,8 @@ public:
                         int buttonRow = buttonPositions[i].first;
                         int buttonCol = buttonPositions[i].second;
                         int buttonLength = buttons[i].length();
+                        
+                        // Only render the button's space, avoiding overlap with borders
                         if (buttonRow == y && buttonCol >= x && buttonCol < x + buttonLength) {
                             buttonFound = true;
                             // Highlight button when the cursor is over it
