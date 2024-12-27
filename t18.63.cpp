@@ -1,6 +1,8 @@
 #include <iostream>
+#include <chrono>
 #include <cstdlib>  // for system("clear")
-#include <chrono>   // for timing functions
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -12,6 +14,8 @@ const string TITLE = "My Custom UI"; // The title for the UI
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (change this to any color)
+const string BUTTON_COLOR = "\033[42m"; // Green background for the button (when cursor is over it)
+const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 
 
 // Grid class to encapsulate the terminal grid and its drawing
@@ -41,7 +45,7 @@ public:
     }
 
     // Renders the grid, now building it in memory to minimize flicker
-    string render(int cursorX, int cursorY) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
@@ -66,13 +70,25 @@ public:
                 // Draw the cursor
                 else if (x == cursorX && y == cursorY) {
                     screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
-                }
-                // Draw the pixels (optional, can be used to mark user actions)
-                else if (grid[y][x] == '*') {
-                    screen += "\033[37m*\033[0m"; // White draw pixel
                 } else {
-                    // Apply color to the empty space
-                    screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
+                    bool buttonFound = false;
+                    // Check if we are on a button
+                    for (size_t i = 0; i < buttonPositions.size(); ++i) {
+                        if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
+                            buttonFound = true;
+                            // Highlight button when the cursor is over it
+                            if (cursorX == x && cursorY == y) {
+                                screen += BUTTON_COLOR + " " + buttons[i] + " \033[0m"; // Active button
+                            } else {
+                                screen += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m"; // Normal button
+                            }
+                            break;
+                        }
+                    }
+                    if (!buttonFound) {
+                        // Default empty space
+                        screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
+                    }
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
@@ -95,6 +111,11 @@ class UI {
 public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
+    void addButton(string label, int row, int col) {
+        buttons.push_back(label);
+        buttonPositions.push_back({row, col});
+    }
+
     void run() {
         grid.clear(); // Clear screen at the start
         showLoadingAnimation(); // Show loading animation before UI starts
@@ -102,13 +123,13 @@ public:
         char input;
         while (true) {
             // Build the UI screen in memory to minimize flickering
-            string screen = grid.render(cursorX, cursorY);
+            string screen = grid.render(cursorX, cursorY, buttons, buttonPositions);
 
             // Move the cursor to the top left of the screen, then output the content
             cout << "\033[H"; // Move cursor to top left
             cout << screen; // Output the built screen at once
 
-            cout << "Use WASD to move, Q to quit: ";
+            cout << "Use WASD to move, E to press, Q to quit: ";
             cin >> input;
 
             switch (input) {
@@ -123,6 +144,9 @@ public:
                     break;
                 case 'd':  // Move cursor right
                     if (cursorX < WIDTH - 2) cursorX++;
+                    break;
+                case 'e':  // Press button under cursor
+                    pressButton(cursorX, cursorY);
                     break;
                 case 'q':  // Quit the program
                     cout << "Exiting..." << endl;
@@ -139,6 +163,8 @@ public:
 private:
     Grid grid;
     int cursorX, cursorY;
+    vector<string> buttons;  // Button labels
+    vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
 
     // Custom sleep to avoid overloading CPU with tight loops
     void customSleep(int milliseconds) {
@@ -163,11 +189,28 @@ private:
             }
         }
     }
+
+    // Press a button under the cursor
+    void pressButton(int x, int y) {
+        for (size_t i = 0; i < buttonPositions.size(); ++i) {
+            if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
+                cout << "\033[HButton '" << buttons[i] << "' pressed!" << endl;
+                return;
+            }
+        }
+        cout << "\033[HNo button at the cursor position!" << endl;
+    }
 };
 
 // Main function to run the UI
 int main() {
     UI ui(WIDTH, HEIGHT);
+    
+    // Add some buttons
+    ui.addButton("Start", 3, 10);
+    ui.addButton("Options", 4, 10);
+    ui.addButton("Exit", 5, 10);
+
     ui.run();
     return 0;
 }
