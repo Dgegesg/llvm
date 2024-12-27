@@ -42,7 +42,7 @@ public:
     }
 
     // Renders the grid, now building it in memory to minimize flicker
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, const vector<string>& labels, const vector<pair<int, int>>& labelPositions) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
@@ -69,6 +69,7 @@ public:
                     screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
                 } else {
                     bool buttonFound = false;
+                    bool labelFound = false;
                     // Check if we are on a button
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
                         int buttonX = buttonPositions[i].second;
@@ -88,7 +89,21 @@ public:
                             break;
                         }
                     }
-                    if (!buttonFound) {
+
+                    // Check if we are on a label
+                    for (size_t i = 0; i < labelPositions.size(); ++i) {
+                        int labelX = labelPositions[i].second;
+                        int labelY = labelPositions[i].first;
+                        int labelWidth = labels[i].length(); // Label width
+
+                        if (y == labelY && x >= labelX && x < labelX + labelWidth) {
+                            labelFound = true;
+                            screen += "\033[37m" + labels[i] + "\033[0m"; // Display label in white
+                            break;
+                        }
+                    }
+
+                    if (!buttonFound && !labelFound) {
                         // Default empty space
                         screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
                     }
@@ -109,7 +124,6 @@ private:
     char** grid;
 };
 
-// UI class to handle user input and cursor movements
 class UI {
 public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
@@ -124,13 +138,23 @@ public:
         }
     }
 
+    void addLabel(string text, int row, int col) {
+        // Ensure label is within the bounds of the grid
+        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+            labels.push_back(text);
+            labelPositions.push_back({row, col});  // Track added position
+        } else {
+            cout << "Label '" << text << "' cannot be placed on the border!" << endl;
+        }
+    }
+
     void run() {
         grid.clear(); // Clear screen at the start
 
         char input;
         while (true) {
             // Build the UI screen in memory to minimize flickering
-            string screen = grid.render(cursorX, cursorY, buttons, buttonPositions);
+            string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, labels, labelPositions);
 
             // Move the cursor to the top left of the screen, then output the content
             cout << "\033[H"; // Move cursor to top left
@@ -170,6 +194,8 @@ private:
     int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
+    vector<string> labels;  // Label texts
+    vector<pair<int, int>> labelPositions;  // Label positions (row, col)
 
     // Press a button under the cursor
     void pressButton(int x, int y) {
@@ -196,6 +222,10 @@ int main() {
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
     ui.addButton("Exit", 5, 10);
+
+    // Add some labels
+    ui.addLabel("Label 1", 2, 5);
+    ui.addLabel("Label 2", 6, 25);
 
     ui.run();
     return 0;
