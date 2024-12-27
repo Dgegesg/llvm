@@ -75,17 +75,17 @@ public:
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
                         int buttonX = buttonPositions[i].second;
                         int buttonY = buttonPositions[i].first;
-                        int buttonWidth = buttons[i].length() + 2; // Button width (padding around it)
+                        int buttonWidth = buttons[i].length(); // Button width
 
-                        // Check if cursor is within the bounds of the button (button area)
+                        // Check if x and y match the button position
                         if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
 
                             // Highlight button when the cursor is over it
-                            if (cursorX == x && cursorY == y) {
-                                screen += BUTTON_COLOR + " " + buttons[i] + " \033[0m"; // Active button
+                            if (cursorX >= buttonX && cursorX < buttonX + buttonWidth && cursorY == buttonY) {
+                                screen += BUTTON_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Active button
                             } else {
-                                screen += BUTTON_NORMAL_COLOR + " " + buttons[i] + " \033[0m"; // Normal button
+                                screen += BUTTON_NORMAL_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Normal button
                             }
                             break;
                         }
@@ -117,13 +117,10 @@ public:
     UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void addButton(string label, int row, int col) {
-        // Check for existing button at the given position (to avoid duplicates)
-        pair<int, int> buttonPos = {row, col};
-        
         // Ensure button is within the bounds of the grid (not on the border)
         if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
             buttons.push_back(label);
-            buttonPositions.push_back(buttonPos);  // Track added position
+            buttonPositions.push_back({row, col});  // Track added position
         } else {
             cout << "Button '" << label << "' cannot be placed on the border!" << endl;
         }
@@ -168,8 +165,6 @@ public:
                     cout << "Invalid input!" << endl;
                     break;
             }
-
-            customSleep(100); // Delay for 100 milliseconds
         }
     }
 
@@ -178,14 +173,6 @@ private:
     int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
-
-    // Custom sleep using a busy-wait loop (fallback)
-    void customSleep(int milliseconds) {
-        auto start = chrono::steady_clock::now();
-        while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
-            // Minimal CPU usage, no-op
-        }
-    }
 
     // Show loading animation before the UI starts
     void showLoadingAnimation() {
@@ -198,7 +185,6 @@ private:
                 // Clear the screen before displaying the loading dots
                 grid.clear();
                 cout << "\033[HLoading" + dots << flush;
-                customSleep(500); // Delay for 500 milliseconds
             }
         }
     }
@@ -208,7 +194,7 @@ private:
         for (size_t i = 0; i < buttonPositions.size(); ++i) {
             int buttonX = buttonPositions[i].second;
             int buttonY = buttonPositions[i].first;
-            int buttonWidth = buttons[i].length() + 2; // Button label width + padding around it
+            int buttonWidth = buttons[i].length(); // Button label width
 
             // Check if the cursor is inside the button's bounds
             if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
