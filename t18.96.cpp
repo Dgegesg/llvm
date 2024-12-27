@@ -9,13 +9,14 @@ const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
-const string TITLE = "Console Interaction UI"; // The title for the UI
+const string TITLE = "Interactive UI"; // Title for interactive UI
+const string CONSOLE_TITLE = "Console Log UI"; // Title for console log UI
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
 const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 
-// Grid class to encapsulate the terminal grid and its drawing
+// Grid class for interactive UI
 class Grid {
 public:
     Grid(int width, int height) : width(width), height(height) {
@@ -41,8 +42,7 @@ public:
         }
     }
 
-    // Renders the grid, now building it in memory to minimize flicker
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, const vector<string>& labels, const vector<pair<int, int>>& labelPositions) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
@@ -51,27 +51,18 @@ public:
         // Render grid border and inside
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
-                // Draw grid corners with bold formatting
-                if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
+                if ((x == 0 && y == 0) || (x == width - 1 && y == 0) ||
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
                     screen += "\033[1m+\033[0m"; // Bold corners
-                }
-                // Bold horizontal edges
-                else if (y == 0 || y == height - 1) {
+                } else if (y == 0 || y == height - 1) {
                     screen += "\033[1m-\033[0m"; // Bold top and bottom edges
-                }
-                // Bold vertical edges
-                else if (x == 0 || x == width - 1) {
+                } else if (x == 0 || x == width - 1) {
                     screen += "\033[1m|\033[0m"; // Bold left and right edges
-                }
-                // Draw the cursor
-                else if (x == cursorX && y == cursorY) {
+                } else if (x == cursorX && y == cursorY) {
                     screen += "\033[31m\033[47m" + string(1, CURSOR_CHAR) + "\033[0m"; // Red cursor with white background
                 } else {
                     bool buttonFound = false;
-                    bool labelFound = false;
 
-                    // Check if we are on a button
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
                         int buttonX = buttonPositions[i].second;
                         int buttonY = buttonPositions[i].first;
@@ -79,44 +70,23 @@ public:
 
                         if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
-
-                            // Hide the button when the cursor is over it
-                            if (cursorX >= buttonX && cursorX < buttonX + buttonWidth && cursorY == buttonY) {
-                                screen += EMPTY_SPACE_COLOR + " \033[0m"; // Show empty space instead of button
-                            } else {
-                                screen += BUTTON_NORMAL_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Normal button
-                            }
+                            screen += BUTTON_NORMAL_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Normal button
                             break;
                         }
                     }
 
-                    // Check if we are on a label
-                    for (size_t i = 0; i < labelPositions.size(); ++i) {
-                        int labelX = labelPositions[i].second;
-                        int labelY = labelPositions[i].first;
-                        int labelWidth = labels[i].length(); // Label width
-
-                        if (y == labelY && x >= labelX && x < labelX + labelWidth) {
-                            labelFound = true;
-                            screen += "\033[37m" + string(1, labels[i][x - labelX]) + "\033[0m"; // Display label in white
-                            break;
-                        }
-                    }
-
-                    if (!buttonFound && !labelFound) {
-                        // Default empty space
-                        screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
+                    if (!buttonFound) {
+                        screen += EMPTY_SPACE_COLOR + " \033[0m"; // Default empty space
                     }
                 }
             }
             screen += "\n"; // Add a new line after each row of the grid
         }
-        return screen; // Return the built string of the UI
+        return screen;
     }
 
-    // This method only clears the screen at the beginning (to avoid flicker during the loop)
     void clear() const {
-        cout << "\033[H\033[J"; // ANSI escape sequence to clear the screen (and move cursor to top-left)
+        cout << "\033[H\033[J"; // ANSI escape sequence to clear the screen
     }
 
 private:
@@ -124,12 +94,58 @@ private:
     char** grid;
 };
 
+// Grid class for console logging UI
+class ConsoleLogGrid {
+public:
+    ConsoleLogGrid(int width, int height) : width(width), height(height) {
+        initGrid();
+    }
+
+    void initGrid() {
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                consoleGrid[y][x] = ' '; // Initialize grid with empty spaces
+            }
+        }
+    }
+
+    void logMessage(const string& message) {
+        for (int i = height - 1; i > 0; --i) {
+            for (int j = 0; j < width; ++j) {
+                consoleGrid[i][j] = consoleGrid[i - 1][j]; // Shift the previous row up
+            }
+        }
+
+        // Insert the new message at the bottom row
+        for (int i = 0; i < message.length(); ++i) {
+            if (i < width) {
+                consoleGrid[0][i] = message[i];
+            }
+        }
+    }
+
+    string render() const {
+        string screen = "\033[1m" + CONSOLE_TITLE + "\033[0m\n";  // Bold title
+        for (int y = 0; y < height; ++y) {
+            screen += string(consoleGrid[y], 0, width) + "\n";
+        }
+        return screen;
+    }
+
+    void clear() const {
+        cout << "\033[H\033[J"; // ANSI escape sequence to clear the screen
+    }
+
+private:
+    int width, height;
+    char consoleGrid[10][40]; // Fixed size console grid for log
+};
+
 class UI {
 public:
-    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
+    UI(int width, int height) : interactiveGrid(width, height), cursorX(1), cursorY(1) {}
 
     void addButton(string label, int row, int col) {
-        // Ensure button is within the bounds of the grid (not on the border)
         if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
             buttons.push_back(label);
             buttonPositions.push_back({row, col});  // Track added position
@@ -138,25 +154,11 @@ public:
         }
     }
 
-    void addLabel(string text, int row, int col) {
-        // Ensure label is within the bounds of the grid
-        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-            labels.push_back(text);
-            labelPositions.push_back({row, col});  // Track added position
-        } else {
-            cout << "Label '" << text << "' cannot be placed on the border!" << endl;
-        }
-    }
-
     void run() {
-        grid.clear(); // Clear screen at the start
-
         char input;
         while (true) {
-            // Build the UI screen in memory to minimize flickering
-            string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, labels, labelPositions);
-
-            // Move the cursor to the top left of the screen, then output the content
+            interactiveGrid.clear();
+            string screen = interactiveGrid.render(cursorX, cursorY, buttons, buttonPositions);
             cout << "\033[H"; // Move cursor to top left
             cout << screen; // Output the built screen at once
 
@@ -190,68 +192,43 @@ public:
     }
 
 private:
-    Grid grid;
+    Grid interactiveGrid;
     int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
-    vector<string> labels;  // Label texts
-    vector<pair<int, int>> labelPositions;  // Label positions (row, col)
 
-    // Press a button under the cursor
     void pressButton(int x, int y) {
         for (size_t i = 0; i < buttonPositions.size(); ++i) {
             int buttonX = buttonPositions[i].second;
             int buttonY = buttonPositions[i].first;
             int buttonWidth = buttons[i].length(); // Button label width
 
-            // Check if the cursor is inside the button's bounds
             if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
-                executeButtonAction(i); // Execute corresponding action
+                consoleEcho("Button '" + buttons[i] + "' pressed!");
                 return;
             }
         }
-        cout << "\033[HNo button at the cursor position!" << endl;
+        consoleEcho("No button at the cursor position!");
     }
 
-    // Execute actions for specific buttons based on index
-    void executeButtonAction(int index) {
-        switch (index) {
-            case 0:  // "Start"
-                consoleEcho("Starting game...");
-                break;
-            case 1:  // "Options"
-                consoleEcho("Opening options...");
-                break;
-            case 2:  // "Exit"
-                consoleEcho("Exiting...");
-                exit(0);
-                break;
-            default:
-                consoleEcho("Unknown button action!");
-                break;
-        }
-    }
-
-    // Function to echo messages to the console
     void consoleEcho(const string& message) {
-        cout << "\033[H" << message << endl;
+        consoleLogGrid.logMessage(message);
     }
+
+    ConsoleLogGrid consoleLogGrid{WIDTH, HEIGHT}; // Console log grid
 };
 
-// Main function to run the UI
 int main() {
-    UI ui(WIDTH, HEIGHT);
-    
-    // Add some buttons
-    ui.addButton("Start", 3, 10);
-    ui.addButton("Options", 4, 10);
-    ui.addButton("Exit", 5, 10);
+    UI ui1(WIDTH, HEIGHT);
+    UI ui2(WIDTH, HEIGHT);
 
-    // Add some labels
-    ui.addLabel("Label1", 6, 5);  // Auto new line for labels
-    ui.addLabel("Label2", 7, 5);
-    ui.addLabel("Label3", 8, 5);
+    ui1.addButton("Start", 3, 10);
+    ui1.addButton("Options", 4, 10);
+    ui1.addButton("Exit", 5, 10);
 
-    ui.run();
+    ui2.run();
+
+    ui1.run(); // Interactive UI
+
     return 0;
 }
