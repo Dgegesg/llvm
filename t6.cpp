@@ -34,7 +34,7 @@ void drawGrid(int cursorX, int cursorY) {
                 if (grid[y][x] == '*') {
                     cout << "\033[37m*\033[0m";  // Display the drawn pixel in white
                 } else {
-                    cout << " ";  // Display empty pixel as space
+                    cout << "█";  // Display empty pixel as space
                 }
             }
         }
