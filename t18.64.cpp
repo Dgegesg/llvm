@@ -74,7 +74,10 @@ public:
                     bool buttonFound = false;
                     // Check if we are on a button
                     for (size_t i = 0; i < buttonPositions.size(); ++i) {
-                        if (buttonPositions[i].first == y && buttonPositions[i].second == x) {
+                        int buttonRow = buttonPositions[i].first;
+                        int buttonCol = buttonPositions[i].second;
+                        int buttonLength = buttons[i].length();
+                        if (buttonRow == y && buttonCol >= x && buttonCol < x + buttonLength) {
                             buttonFound = true;
                             // Highlight button when the cursor is over it
                             if (cursorX == x && cursorY == y) {
