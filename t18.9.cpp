@@ -98,7 +98,7 @@ public:
 
                         if (y == labelY && x >= labelX && x < labelX + labelWidth) {
                             labelFound = true;
-                            screen += "\033[37m" + labels[i] + "\033[0m"; // Display label in white
+                            screen += "\033[37m" + string(1, labels[i][x - labelX]) + "\033[0m"; // Display label in white
                             break;
                         }
                     }
