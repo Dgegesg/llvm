@@ -1,5 +1,4 @@
 #include <iostream>
-#include <chrono>
 #include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
@@ -14,7 +13,6 @@ const string TITLE = "My Custom UI"; // The title for the UI
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
-const string BUTTON_COLOR = "\033[42m"; // Green background for the button (when cursor is over it)
 const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 
 // Grid class to encapsulate the terminal grid and its drawing
@@ -81,9 +79,9 @@ public:
                         if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
 
-                            // Highlight button when the cursor is over it
+                            // Hide the button when the cursor is over it
                             if (cursorX >= buttonX && cursorX < buttonX + buttonWidth && cursorY == buttonY) {
-                                screen += BUTTON_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Active button
+                                screen += EMPTY_SPACE_COLOR + " \033[0m"; // Show empty space instead of button
                             } else {
                                 screen += BUTTON_NORMAL_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Normal button
                             }
@@ -128,7 +126,6 @@ public:
 
     void run() {
         grid.clear(); // Clear screen at the start
-        showLoadingAnimation(); // Show loading animation before UI starts
 
         char input;
         while (true) {
@@ -173,21 +170,6 @@ private:
     int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
-
-    // Show loading animation before the UI starts
-    void showLoadingAnimation() {
-        for (int i = 0; i < 5; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                string dots = "";
-                for (int dotCount = 0; dotCount < j; ++dotCount) {
-                    dots += ".";
-                }
-                // Clear the screen before displaying the loading dots
-                grid.clear();
-                cout << "\033[HLoading" + dots << flush;
-            }
-        }
-    }
 
     // Press a button under the cursor
     void pressButton(int x, int y) {
