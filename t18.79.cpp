@@ -1,9 +1,7 @@
 #include <iostream>
-#include <chrono>
-#include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
-#include <algorithm>  // For std::find
+#include <algorithm>  // for std::find
 
 using namespace std;
 
@@ -44,7 +42,7 @@ public:
         }
     }
 
-    // Renders the grid, now building it in memory to minimize flicker
+    // Renders the grid
     string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions) const {
         string screen = ""; // Empty string to accumulate grid content
 
@@ -137,7 +135,6 @@ public:
 
     void run() {
         grid.clear(); // Clear screen at the start
-        showLoadingAnimation(); // Show loading animation before UI starts
 
         char input;
         while (true) {
@@ -174,8 +171,6 @@ public:
                     cout << "Invalid input!" << endl;
                     break;
             }
-
-            customSleep(100); // Delay for 100 milliseconds
         }
     }
 
@@ -184,30 +179,6 @@ private:
     int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
-
-    // Custom sleep to avoid overloading CPU with tight loops
-    void customSleep(int milliseconds) {
-        auto start = chrono::steady_clock::now();
-        while (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() < milliseconds) {
-            // Empty loop to simulate sleep
-        }
-    }
-
-    // Show loading animation before the UI starts
-    void showLoadingAnimation() {
-        for (int i = 0; i < 5; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                string dots = "";
-                for (int dotCount = 0; dotCount < j; ++dotCount) {
-                    dots += ".";
-                }
-                // Clear the screen before displaying the loading dots
-                grid.clear();
-                cout << "\033[HLoading" + dots << flush;
-                customSleep(500); // Delay for 500 milliseconds
-            }
-        }
-    }
 
     // Press a button under the cursor
     void pressButton(int x, int y) {
@@ -234,7 +205,6 @@ int main() {
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
     ui.addButton("Exit", 5, 10);
-    ui.addButton("Start", 3, 10);  // This should be ignored as a duplicate
 
     ui.run();
     return 0;
