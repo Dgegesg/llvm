@@ -14,6 +14,8 @@ const string TITLE = "V18 August UI"; // The title for the UI
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space (can be customized)
+const string BUTTON_BG_COLOR = "\033[47m"; // White background for buttons
+const string BUTTON_TEXT_COLOR = "\033[30m"; // Black text color for buttons
 
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
@@ -79,13 +81,13 @@ public:
             screen += "\n"; // Add a new line after each row of the grid
         }
 
-        // Render the menu at the bottom
+        // Render the menu at the bottom with buttons
         for (int i = 0; i < menuOptions.size(); ++i) {
-            // Highlight the selected option
+            // Highlight the selected option (the button where the cursor is)
             if (i == selectedMenuOption) {
-                screen += "> " + menuOptions[i] + "\n"; // Add a '>' to indicate selection
+                screen += BUTTON_BG_COLOR + BUTTON_TEXT_COLOR + "  " + menuOptions[i] + "  \033[0m\n"; // White button with black text
             } else {
-                screen += "  " + menuOptions[i] + "\n"; // Regular menu options
+                screen += "  " + menuOptions[i] + "  \n"; // Regular menu options
             }
         }
 
@@ -137,7 +139,7 @@ public:
                 case 'q':  // Quit the program
                     quitAnimation();  // Start the quit animation
                     return;
-                case '\n':  // Enter key to select menu option
+                case '\n':  // Enter key to select menu option (when the cursor is over a button)
                     handleMenuSelection();
                     break;
                 default:
