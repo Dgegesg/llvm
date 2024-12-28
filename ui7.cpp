@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/select.h>
+#include <cstring>
 
 char getKeyPress() {
     char ch;
@@ -14,13 +15,12 @@ char getKeyPress() {
     timeout.tv_sec = 0;
     timeout.tv_usec = 0;
 
-    // Wait for input with a timeout of 0 seconds
     int ret = select(STDIN_FILENO + 1, &set, nullptr, nullptr, &timeout);
 
     if (ret > 0) {
         read(STDIN_FILENO, &ch, 1);
     } else {
-        ch = 0;  // No input detected
+        ch = 0;
     }
 
     return ch;
