@@ -54,6 +54,8 @@ public:
 
         // Render log title above the log UI
         screen += string(WIDTH + 2, ' ') + "\033[1m" + LOG_TITLE + "\033[0m\n";
+
+        // Render log border top
         screen += string(WIDTH + 2, ' ') + "\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
 
         // Render grid and log side by side
