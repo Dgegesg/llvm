@@ -184,6 +184,7 @@ int main() {
                     changeColor(color);
                 } else if (buttons[buttonIndex] == "Exit") {
                     cout << "\033[H";
+                    system("clear");
                     break;
                 }
             }
