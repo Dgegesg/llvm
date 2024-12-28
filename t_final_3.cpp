@@ -48,15 +48,10 @@ public:
 
                 for (int x = 0; x < WIDTH - 2; ++x) {
                     if (x == cursorX && y == cursorY) {
-                        if (x >= buttonStartX && x < buttonStartX + button.length()) {
-                            // Cursor over button text: Overlay cursor but keep button text visible
-                            screen += CURSOR_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
-                        } else {
-                            // Cursor not on button text
-                            screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
-                        }
-                    } else if (x >= buttonStartX && x < buttonStartX + button.length()) {
-                        // Button text (always visible)
+                        // Cursor over button row; hide the button entirely and show the cursor
+                        screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
+                    } else if (x >= buttonStartX && x < buttonStartX + button.length() && !(y == cursorY)) {
+                        // Button text (only visible if cursor is not on this row)
                         screen += BUTTON_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
                     } else {
                         // Empty space
