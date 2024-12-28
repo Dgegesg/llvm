@@ -175,6 +175,8 @@ public:
         char input;
         while (true) {
             renderInteractivePage();
+
+            cout << "\033[" << HEIGHT + 3 << ";1H"; // Move cursor below the UI for input
             cin >> input;
             handleInput(input);
         }
