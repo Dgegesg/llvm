@@ -23,10 +23,11 @@ class Grid {
 public:
     Grid(int width, int height) : width(width), height(height) {}
 
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<string>& logMessages) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<string>& logMessages, bool inputMode) const {
         string screen;
 
         // Render Titles
+        string title = inputMode ? "Input:" : "Choose an option:";
         screen += BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
         screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
 
@@ -77,7 +78,7 @@ public:
         }
 
         screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
-        screen += "Choose an option:";
+        screen += title;
 
         return screen;
     }
@@ -90,12 +91,22 @@ int main() {
     Grid grid(WIDTH, HEIGHT);
 
     int cursorX = WIDTH / 2 - 1, cursorY = 3;
-    vector<string> buttons = { "Start", "Options", "Exit" };
+    vector<string> buttons = { "Start", "Options", "Input", "Exit" };
     vector<string> logMessages = { "Welcome to the UI!", "Initializing...", "Ready." };
+    bool inputMode = false;
 
     while (true) {
         system("clear");
-        cout << grid.render(cursorX, cursorY, buttons, logMessages);
+        cout << grid.render(cursorX, cursorY, buttons, logMessages, inputMode);
+
+        if (inputMode) {
+            string userInput;
+            cin.ignore(); // Clear newline
+            getline(cin, userInput);
+            logMessages.push_back("Input: " + userInput);
+            inputMode = false;
+            continue;
+        }
 
         char input;
         cin >> input;
@@ -111,9 +122,13 @@ int main() {
         } else if (input == 'e') {
             int buttonIndex = cursorY - 3;
             if (buttonIndex >= 0 && buttonIndex < (int)buttons.size() && cursorX >= (WIDTH - buttons[buttonIndex].length()) / 2 && cursorX < (WIDTH + buttons[buttonIndex].length()) / 2) {
-                logMessages.push_back("Selected: " + buttons[buttonIndex]);
-                if (buttons[buttonIndex] == "Exit") {
-                    break;
+                if (buttons[buttonIndex] == "Input") {
+                    inputMode = true;
+                } else {
+                    logMessages.push_back("Selected: " + buttons[buttonIndex]);
+                    if (buttons[buttonIndex] == "Exit") {
+                        break;
+                    }
                 }
             } else {
                 logMessages.push_back("No button selected.");
