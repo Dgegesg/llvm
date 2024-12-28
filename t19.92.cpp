@@ -6,7 +6,7 @@
 using namespace std;
 
 const int WIDTH = 40;  // Width of the screen
-const int HEIGHT = 10; // Height of the screen
+const int HEIGHT = 15; // Height of the screen (increased for log display)
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "Custom Console UI"; // The title for the UI
@@ -15,9 +15,9 @@ const string TITLE = "Custom Console UI"; // The title for the UI
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
 const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 const string CURSOR_COLOR = "\033[31m\033[47m"; // Red cursor with white background
-const string CONSOLE_LOG_COLOR = "\033[42m"; // Green background for console log grid
+const string CONSOLE_LOG_COLOR = "\033[42m"; // Green background for console log
 
-const int MAX_LOG_LINES = 8; // Max number of lines to display in the console log
+const int LOG_HEIGHT = 5; // Height of the console log section
 
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
@@ -95,25 +95,20 @@ public:
                     }
                 }
             }
-            screen += "\n"; // Add a new line after each row of the grid
-        }
 
-        // Render console log inside the bottom border
-        if (!consoleLog.empty()) {
-            int linesToDisplay = min((int)consoleLog.size(), MAX_LOG_LINES);  // Display up to MAX_LOG_LINES
-            int startY = HEIGHT - linesToDisplay - 1;
-
-            screen += "\n" + CONSOLE_LOG_COLOR;
-            for (int i = startY; i < HEIGHT - 1; ++i) {
-                if (i < consoleLog.size()) {
-                    string message = consoleLog[i];
-                    if (message.length() > WIDTH - 2) { // Cut long messages
-                        message = message.substr(0, WIDTH - 2);
+            // Render console log at the bottom rows of the grid
+            if (y >= height - LOG_HEIGHT - 1 && y < height - 1) {
+                int logIndex = y - (height - LOG_HEIGHT - 1); // Map grid row to log index
+                if (logIndex < consoleLog.size()) {
+                    string logMessage = consoleLog[logIndex];
+                    if (logMessage.length() > width - 2) { // Truncate long messages
+                        logMessage = logMessage.substr(0, width - 2);
                     }
-                    screen += "\n" + message;
+                    screen += " " + CONSOLE_LOG_COLOR + logMessage + "\033[0m";
                 }
             }
-            screen += "\033[0m"; // Reset color after displaying log
+
+            screen += "\n"; // Add a new line after each row of the grid
         }
 
         return screen; // Return the built string of the UI
@@ -134,7 +129,7 @@ public:
 
     void addButton(string label, int row, int col) {
         // Ensure button is within the bounds of the grid (not on the border)
-        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+        if (row > 0 && row < HEIGHT - LOG_HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
             buttons.push_back(label);
             buttonPositions.push_back({row, col});  // Track added position
         } else {
@@ -144,18 +139,10 @@ public:
 
     void consoleEcho(string message) {
         // Add message to the log, trimming if necessary
-        if (consoleLog.size() >= MAX_LOG_LINES) {
+        if (consoleLog.size() >= LOG_HEIGHT) {
             consoleLog.erase(consoleLog.begin()); // Remove oldest line if limit exceeded
         }
         consoleLog.push_back(message);  // Add new message
-    }
-
-    void switchToInteractivePage() {
-        activePage = 1;
-    }
-
-    void switchToConsoleLogPage() {
-        activePage = 2;
     }
 
     void run() {
@@ -163,18 +150,7 @@ public:
 
         char input;
         while (true) {
-            switch (activePage) {
-                case 1:
-                    renderInteractivePage();
-                    break;
-                case 2:
-                    renderConsoleLogPage();
-                    break;
-                default:
-                    cout << "Invalid page!" << endl;
-                    break;
-            }
-
+            render();
             cin >> input;
             handleInput(input);
         }
@@ -186,16 +162,10 @@ private:
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
     vector<string> consoleLog;  // Console log messages
-    const int MAX_LOG_LINES = 8;
 
-    void renderInteractivePage() {
-        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, {});
-        cout << "\033[H" << screen << "Use WASD to move, E to press, 2 to switch to Console Log Page\n";
-    }
-
-    void renderConsoleLogPage() {
-        string screen = grid.render(1, HEIGHT - MAX_LOG_LINES - 1, {}, {}, consoleLog);  // Console log rendered at the bottom
-        cout << "\033[H" << screen << "Use 1 to switch back to Interactive Page\n";
+    void render() {
+        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog);
+        cout << "\033[H" << screen << "Use WASD to move, E to press, Q to quit\n";
     }
 
     void handleInput(char input) {
@@ -204,7 +174,7 @@ private:
                 if (cursorY > 1) cursorY--;
                 break;
             case 's':  // Move cursor down
-                if (cursorY < HEIGHT - 2) cursorY++;
+                if (cursorY < HEIGHT - LOG_HEIGHT - 2) cursorY++;
                 break;
             case 'a':  // Move cursor left
                 if (cursorX > 1) cursorX--;
@@ -214,12 +184,6 @@ private:
                 break;
             case 'e':  // Press button under cursor
                 pressButton(cursorX, cursorY);
-                break;
-            case '1':  // Switch to Interactive Page
-                switchToInteractivePage();
-                break;
-            case '2':  // Switch to Console Log Page
-                switchToConsoleLogPage();
                 break;
             case 'q':  // Quit the program
                 cout << "Exiting..." << endl;
@@ -268,7 +232,7 @@ private:
 // Main function to run the UI
 int main() {
     UI ui(WIDTH, HEIGHT);
-    
+
     // Add some buttons
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
