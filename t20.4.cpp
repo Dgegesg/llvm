@@ -16,7 +16,7 @@ const string TITLE = "Custom Console UI"; // The title for the UI
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
 const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
 const string CURSOR_COLOR = "\033[31m\033[47m"; // Red cursor with white background
-const string CONSOLE_LOG_COLOR = "\033[42m"; // Green background for console log grid
+const string CONSOLE_LOG_COLOR = "\033[44m"; // Blue background for console log grid
 
 // Grid class to encapsulate the terminal grid and its drawing
 class Grid {
@@ -247,7 +247,6 @@ private:
                 break;
             case 2:  // "Exit"
                 consoleEcho("Exiting...");
-                exit(0);
                 break;
             default:
                 consoleEcho("Unknown button action!");
