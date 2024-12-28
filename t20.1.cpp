@@ -247,6 +247,7 @@ private:
                 break;
             case 2:  // "Exit"
                 consoleEcho("Exiting...");
+                exit();
                 break;
             default:
                 consoleEcho("Unknown button action!");
