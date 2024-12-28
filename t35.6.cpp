@@ -45,8 +45,10 @@ public:
                 for (int x = 0; x < WIDTH - 2; ++x) {
                     if (x == cursorX && y == cursorY) {
                         screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
-                    } else {
+                    } else if (!(x >= (WIDTH - button.length()) / 2 && x < (WIDTH + button.length()) / 2 && y == cursorY)) {
                         screen += BUTTON_COLOR + string(1, row[x]) + RESET_COLOR;
+                    } else {
+                        screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
                 }
             } else {
