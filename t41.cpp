@@ -32,7 +32,7 @@ public:
 
     // Render Titles
     string title = inputMode ? "\033[KWe need your input data to process: \n\033[J" : "\033[KCursor control (wasd) input: \n\033[J";
-    screen += BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
+    screen += "\033[K" + BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
     screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
 
     int logStartIndex = max(0, (int)logMessages.size() - HEIGHT);
