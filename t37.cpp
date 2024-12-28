@@ -6,8 +6,8 @@
 using namespace std;
 
 const int WIDTH = 40;
-const int HEIGHT = 10;
-const int LOG_WIDTH = 30;
+const int HEIGHT = 20;
+const int LOG_WIDTH = 50;
 const char EMPTY_CHAR = ' ';
 const string MAIN_TITLE = "Custom Console UI";
 const string LOG_TITLE = "Output Echo";
