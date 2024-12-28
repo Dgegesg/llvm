@@ -2,7 +2,6 @@
 #include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
-#include <algorithm> // For max
 
 using namespace std;
 
@@ -21,15 +20,16 @@ const string BUTTON_COLOR = "\033[44;97m"; // Dark blue button with white text
 const string CURSOR_COLOR = "\033[41;97m"; // Red background with white text for cursor
 const string RESET_COLOR = "\033[0m"; // Reset color
 
+// Grid class to encapsulate the terminal grid and its drawing
 class Grid {
 public:
     Grid(int width, int height) : width(width), height(height) {}
 
-    // Render the UI
+    // Renders the UI
     string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<string>& logMessages) const {
-        string screen;
+        string screen = "";
 
-        // Render the titles
+        // Render titles
         screen += BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
 
         // Top borders
