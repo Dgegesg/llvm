@@ -192,6 +192,6 @@ int main() {
             logMessages.erase(logMessages.begin());
         }
     }
-
+    cout << "\033[2J";
     return 0;
 }
