@@ -48,10 +48,18 @@ public:
 
                 for (int x = 0; x < WIDTH - 2; ++x) {
                     if (x == cursorX && y == cursorY) {
-                        screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
+                        if (x >= buttonStartX && x < buttonStartX + button.length()) {
+                            // Cursor over button text: Overlay cursor but keep button text visible
+                            screen += CURSOR_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
+                        } else {
+                            // Cursor not on button text
+                            screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
+                        }
                     } else if (x >= buttonStartX && x < buttonStartX + button.length()) {
+                        // Button text (always visible)
                         screen += BUTTON_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
                     } else {
+                        // Empty space
                         screen += currentColor + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
                 }
@@ -64,6 +72,7 @@ public:
                             int labelStartX = (WIDTH - 2 - labelText.length()) / 2;
                             if (x >= labelStartX && x < labelStartX + labelText.length()) {
                                 if (x == cursorX && y == cursorY) {
+                                    // Cursor on label
                                     screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                                 } else {
                                     screen += LABEL_COLOR + string(1, labelText[x - labelStartX]) + RESET_COLOR;
@@ -136,7 +145,6 @@ int main() {
     while (true) {
         cout << "\033[H";
         cout << grid.render(cursorX, cursorY, buttons, labels, logMessages, inputMode);
-        cout.flush(); // Ensure the output is flushed to the terminal
 
         if (inputMode) {
             string userInput;
