@@ -190,7 +190,7 @@ private:
 
     void renderInteractivePage() {
         string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog, labels);
-        cout << "\033[H" << screen << "Use WASD to move, E to press, Q to quit\n";
+        cout << "\033[H" << screen;
     }
 
     void handleInput(char input) {
