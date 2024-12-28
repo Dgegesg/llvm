@@ -31,8 +31,7 @@ public:
     string screen;
 
     // Render Titles
-    cout << "\033[H";
-    string title = inputMode ? "\033[KWe need your input data to process: \n" : "\033[KCursor control (wasd) input: \n";
+    string title = inputMode ? "\033[KWe need your input data to process: \n\033[J" : "\033[KCursor control (wasd) input: \n\033[J";
     screen += BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
     screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
 
