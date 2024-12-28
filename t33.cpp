@@ -49,16 +49,16 @@ public:
                 string row = string((WIDTH - 2 - button.length()) / 2, EMPTY_CHAR) + button;
                 row += string(WIDTH - 2 - row.length(), EMPTY_CHAR);
 
-                if (cursorY == y) {
+                if (cursorY == y && cursorX >= (WIDTH - button.length()) / 2 && cursorX < (WIDTH + button.length()) / 2) {
+                    screen += string(WIDTH - 2, EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR);
+                } else {
                     for (int x = 0; x < WIDTH - 2; ++x) {
-                        if (x == cursorX) {
+                        if (x == cursorX && y == cursorY) {
                             screen += CURSOR_COLOR + CURSOR_CHAR + RESET_COLOR;
                         } else {
                             screen += BUTTON_COLOR + row[x] + RESET_COLOR;
                         }
                     }
-                } else {
-                    screen += BUTTON_COLOR + row + RESET_COLOR;
                 }
             } else {
                 for (int x = 0; x < WIDTH - 2; ++x) {
@@ -78,9 +78,9 @@ public:
                 if (logMessage.length() > LOG_WIDTH - 2) {
                     logMessage = logMessage.substr(0, LOG_WIDTH - 2);
                 }
-                screen += logMessage + string(LOG_WIDTH - 2 - logMessage.length(), EMPTY_CHAR);
+                screen += EMPTY_SPACE_COLOR + logMessage + string(LOG_WIDTH - 2 - logMessage.length(), EMPTY_CHAR) + RESET_COLOR;
             } else {
-                screen += string(LOG_WIDTH - 2, EMPTY_CHAR);
+                screen += string(LOG_WIDTH - 2, EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR);
             }
 
             screen += BORDER_COLOR + "|" + RESET_COLOR + "\n";
