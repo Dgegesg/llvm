@@ -116,7 +116,7 @@ public:
         }
 
         // Render "Choose an option:" label below the grid
-        screen += "\033[" + to_string(HEIGHT + 2) + ";2HChoose an option:";
+        screen += "\033[" + to_string(height + 1) + ";2HChoose an option:";
 
         return screen;
     }
