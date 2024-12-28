@@ -39,7 +39,7 @@ public:
 
             if (y >= 3 && y < 3 + (int)buttons.size()) {
                 int buttonIndex = y - 3;
-                if (buttonVisibility[buttonIndex]) {
+                if (buttonVisibility[buttonIndex] && !(cursorX >= (WIDTH - 2 - buttons[buttonIndex].length()) / 2 && cursorX < (WIDTH + buttons[buttonIndex].length()) / 2 && cursorY == y)) {
                     string button = buttons[buttonIndex];
                     string row = string((WIDTH - 2 - button.length()) / 2, EMPTY_CHAR) + button;
                     row += string(WIDTH - 2 - row.length(), EMPTY_CHAR);
@@ -126,16 +126,14 @@ int main() {
         char input;
         cin >> input;
 
-        if (input == 'w') {
-            do {
-                cursorY--;
-                if (cursorY < 3) cursorY = 3 + buttons.size() - 1;
-            } while (!buttonVisibility[cursorY - 3]);
-        } else if (input == 's') {
-            do {
-                cursorY++;
-                if (cursorY >= 3 + buttons.size()) cursorY = 3;
-            } while (!buttonVisibility[cursorY - 3]);
+        if (input == 'w' && cursorY > 0) {
+            cursorY--;
+        } else if (input == 's' && cursorY < HEIGHT - 1) {
+            cursorY++;
+        } else if (input == 'a' && cursorX > 0) {
+            cursorX--;
+        } else if (input == 'd' && cursorX < WIDTH - 3) {
+            cursorX++;
         } else if (input == 'e') {
             int buttonIndex = cursorY - 3;
             if (buttonIndex >= 0 && buttonIndex < (int)buttons.size() && buttonVisibility[buttonIndex]) {
@@ -146,10 +144,6 @@ int main() {
                 } else if (buttons[buttonIndex] == "Exit") {
                     break;
                 }
-                do {
-                    cursorY++;
-                    if (cursorY >= 3 + buttons.size()) cursorY = 3;
-                } while (!buttonVisibility[cursorY - 3]);
             }
         }
 
