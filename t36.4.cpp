@@ -43,13 +43,14 @@ public:
                 int buttonStartX = (WIDTH - 2 - button.length()) / 2;
 
                 for (int x = 0; x < WIDTH - 2; ++x) {
-                    if (x == cursorX && y == cursorY) {
+                    if (x == cursorX && y == cursorY && x >= buttonStartX && x < buttonStartX + button.length()) {
+                        // Cursor over button text
                         screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
-                    } else if (x >= buttonStartX && x < buttonStartX + button.length() && y == cursorY) {
-                        screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
                     } else if (x >= buttonStartX && x < buttonStartX + button.length()) {
+                        // Button text
                         screen += BUTTON_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
                     } else {
+                        // Empty space
                         screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
                 }
@@ -128,7 +129,8 @@ int main() {
             cursorX++;
         } else if (input == 'e') {
             int buttonIndex = cursorY - 3;
-            if (buttonIndex >= 0 && buttonIndex < (int)buttons.size()) {
+            int buttonStartX = (WIDTH - 2 - buttons[buttonIndex].length()) / 2;
+            if (buttonIndex >= 0 && buttonIndex < (int)buttons.size() && cursorX >= buttonStartX && cursorX < buttonStartX + (int)buttons[buttonIndex].length()) {
                 logMessages.push_back("Selected: " + buttons[buttonIndex]);
                 if (buttons[buttonIndex] == "Input") {
                     inputMode = true;
