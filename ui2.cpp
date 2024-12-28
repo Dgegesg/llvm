@@ -1,44 +1,79 @@
 #include <iostream>
-#include <termios.h>
 #include <unistd.h>
+#include <sys/select.h>
 
 using namespace std;
 
-// Function to set terminal to raw mode
-void setRawMode() {
-    termios term;
-    tcgetattr(STDIN_FILENO, &term);
-    term.c_lflag &= ~(ICANON | ECHO); // Disable canonical mode and echo
-    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+const char CURSOR_CHAR = 'X';
+const char EMPTY_CHAR = ' ';
+
+const int WIDTH = 40;
+const int HEIGHT = 10;
+
+void clearScreen() {
+    cout << "\033[H\033[J"; // Clear screen
 }
 
-// Function to restore terminal to default mode
-void restoreMode() {
-    termios term;
-    tcgetattr(STDIN_FILENO, &term);
-    term.c_lflag |= (ICANON | ECHO); // Enable canonical mode and echo
-    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+void renderGrid(int cursorX, int cursorY) {
+    clearScreen();
+    cout << "Artoriasphere\n";
+    cout << string(WIDTH, '-') << "\n";
+
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            if (x == cursorX && y == cursorY) {
+                cout << CURSOR_CHAR;
+            } else {
+                cout << EMPTY_CHAR;
+            }
+        }
+        cout << '\n';
+    }
+
+    cout << string(WIDTH, '-') << "\n";
+    cout << "Use Arrow Keys to move and 'q' to quit.\n";
 }
 
 int main() {
-    cout << "Press 'q' to quit.\n";
-    
-    // Set terminal to raw mode
-    setRawMode();
+    int cursorX = WIDTH / 2;
+    int cursorY = HEIGHT / 2;
 
-    char input;
     while (true) {
-        input = getchar(); // Read a single character
+        renderGrid(cursorX, cursorY);
 
-        if (input == 'q') { // Quit on 'q'
-            cout << "\nExiting program.\n";
+        // Set non-blocking input
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(STDIN_FILENO, &set);
+        
+        struct timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 10000; // 10ms
+
+        int ready = select(STDIN_FILENO + 1, &set, NULL, NULL, &timeout);
+
+        if (ready == -1) {
+            cerr << "Error in select().\n";
             break;
-        }
+        } else if (ready > 0) {
+            char input;
+            read(STDIN_FILENO, &input, 1);
 
-        cout << "You pressed: " << input << '\n';
+            if (input == 'q') {
+                cout << "\nExiting...\n";
+                break;
+            } else if (input == 'w' && cursorY > 0) {
+                cursorY--;
+            } else if (input == 's' && cursorY < HEIGHT - 1) {
+                cursorY++;
+            } else if (input == 'a' && cursorX > 0) {
+                cursorX--;
+            } else if (input == 'd' && cursorX < WIDTH - 1) {
+                cursorX++;
+            }
+        }
     }
 
-    // Restore terminal mode before exiting
-    restoreMode();
+    clearScreen();
     return 0;
 }
