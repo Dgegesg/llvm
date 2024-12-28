@@ -148,7 +148,7 @@ int main() {
 
         if (inputMode) {
             string userInput;
-            cin.ignore(); // Clear newline
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear newline
             getline(cin, userInput);
             string processedInput = processInput(userInput);
             logMessages.push_back(processedInput);
