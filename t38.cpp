@@ -143,7 +143,7 @@ int main() {
     bool inputMode = false;
 
     while (true) {
-        system("clear");
+        cout << "\033[H";
         cout << grid.render(cursorX, cursorY, buttons, labels, logMessages, inputMode);
 
         if (inputMode) {
