@@ -98,7 +98,7 @@ public:
 
             // Render log UI border
             if (y == 0 || y == height - 1) {
-                screen += "  \033[1m" + string(LOG_WIDTH, '-') + "\033[0m\n";
+                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
             } else {
                 screen += "  \033[1m|\033[0m";
 
@@ -131,7 +131,7 @@ private:
 
 class UI {
 public:
-    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1), activePage(1) {}
+    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
 
     void addButton(string label, int row, int col) {
         // Ensure button is within the bounds of the grid (not on the border)
@@ -143,6 +143,15 @@ public:
         }
     }
 
+    void addLabel(string label, int row, int col) {
+        // Add a label at a specific position
+        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+            labels.push_back({label, {row, col}});
+        } else {
+            cout << "Label '" << label << "' cannot be placed on the border!" << endl;
+        }
+    }
+
     void consoleEcho(string message) {
         // Add message to the log, trimming if necessary
         if (consoleLog.size() >= HEIGHT - 2) {
@@ -151,31 +160,12 @@ public:
         consoleLog.push_back(message);  // Add new message
     }
 
-    void switchToInteractivePage() {
-        activePage = 1;
-    }
-
-    void switchToConsoleLogPage() {
-        activePage = 2;
-    }
-
     void run() {
         grid.clear(); // Clear screen at the start
 
         char input;
         while (true) {
-            switch (activePage) {
-                case 1:
-                    renderInteractivePage();
-                    break;
-                case 2:
-                    renderConsoleLogPage();
-                    break;
-                default:
-                    cout << "Invalid page!" << endl;
-                    break;
-            }
-
+            renderInteractivePage();
             cin >> input;
             handleInput(input);
         }
@@ -183,19 +173,25 @@ public:
 
 private:
     Grid grid;
-    int cursorX, cursorY, activePage;
+    int cursorX, cursorY;
     vector<string> buttons;  // Button labels
     vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
+    vector<pair<string, pair<int, int>>> labels; // Labels with positions
     vector<string> consoleLog;  // Console log messages
 
     void renderInteractivePage() {
         string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog);
-        cout << "\033[H" << screen << "Use WASD to move, E to press, 2 to switch to Console Log Page\n";
-    }
+        
+        // Render labels
+        for (const auto& label : labels) {
+            int row = label.second.first;
+            int col = label.second.second;
+            if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+                screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + label.first; // Position the label
+            }
+        }
 
-    void renderConsoleLogPage() {
-        string screen = grid.render(1, HEIGHT - 2, {}, {}, consoleLog);  // Console log rendered inside the grid
-        cout << "\033[H" << screen << "Use 1 to switch back to Interactive Page\n";
+        cout << "\033[H" << screen << "Use WASD to move, E to press, Q to quit\n";
     }
 
     void handleInput(char input) {
@@ -214,12 +210,6 @@ private:
                 break;
             case 'e':  // Press button under cursor
                 pressButton(cursorX, cursorY);
-                break;
-            case '1':  // Switch to Interactive Page
-                switchToInteractivePage();
-                break;
-            case '2':  // Switch to Console Log Page
-                switchToConsoleLogPage();
                 break;
             case 'q':  // Quit the program
                 cout << "Exiting..." << endl;
@@ -273,6 +263,10 @@ int main() {
     ui.addButton("Start", 3, 10);
     ui.addButton("Options", 4, 10);
     ui.addButton("Exit", 5, 10);
+
+    // Add some labels
+    ui.addLabel("Welcome!", 1, 5);
+    ui.addLabel("Choose an option:", 2, 5);
 
     ui.run();
     return 0;
