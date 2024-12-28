@@ -7,6 +7,7 @@ using namespace std;
 
 const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
+const int LOG_WIDTH = 20; // Width of the console log area
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "Custom Console UI"; // The title for the UI
@@ -50,8 +51,9 @@ public:
         // Add the title at the top (above the grid)
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
 
-        // Render grid border and inside
+        // Render grid and log side by side
         for (int y = 0; y < height; ++y) {
+            // Render interactive UI
             for (int x = 0; x < width; ++x) {
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
@@ -93,19 +95,25 @@ public:
                     }
                 }
             }
-            screen += "\n"; // Add a new line after each row of the grid
-        }
 
-        // Render console log inside the bottom border
-        if (!consoleLog.empty()) {
-            int linesToDisplay = min((int)consoleLog.size(), height - 2);  // Display up to the grid height minus borders
+            // Render log UI border
+            if (y == 0 || y == height - 1) {
+                screen += "  \033[1m" + string(LOG_WIDTH, '-') + "\033[0m\n";
+            } else {
+                screen += "  \033[1m|\033[0m";
 
-            for (int i = 0; i < linesToDisplay; ++i) {
-                string message = consoleLog[i];
-                if (message.length() > width - 2) { // Cut long messages
-                    message = message.substr(0, width - 2);
+                // Render log messages inside
+                if (y - 1 < (int)consoleLog.size()) {
+                    string message = consoleLog[y - 1];
+                    if (message.length() > LOG_WIDTH - 2) { // Cut long messages
+                        message = message.substr(0, LOG_WIDTH - 2);
+                    }
+                    screen += CONSOLE_LOG_COLOR + message + string(LOG_WIDTH - 2 - message.length(), ' ') + "\033[0m";
+                } else {
+                    screen += string(LOG_WIDTH - 2, ' ');
                 }
-                screen += CONSOLE_LOG_COLOR + " " + message + string(width - 2 - message.length(), ' ') + " \033[0m\n";
+
+                screen += "\033[1m|\033[0m\n";
             }
         }
 
@@ -181,7 +189,7 @@ private:
     vector<string> consoleLog;  // Console log messages
 
     void renderInteractivePage() {
-        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, {});
+        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog);
         cout << "\033[H" << screen << "Use WASD to move, E to press, 2 to switch to Console Log Page\n";
     }
 
