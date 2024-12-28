@@ -1,16 +1,16 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstdlib> // for system("clear")
+#include <cstdlib>
 #include <limits>
 
 using namespace std;
 
 const int WIDTH = 40;
-const int HEIGHT = 20;
-const int LOG_WIDTH = 50;
+const int HEIGHT = 10;
+const int LOG_WIDTH = 35;
 const char EMPTY_CHAR = ' ';
-const string MAIN_TITLE = "Custom Console UI";
+const string MAIN_TITLE = "Artoriasphere";
 const string LOG_TITLE = "Output Echo";
 const char CURSOR_CHAR = 'X';
 
@@ -21,7 +21,7 @@ const string CURSOR_COLOR = "\033[41;97m";
 const string LABEL_COLOR = "\033[44;97m";
 const string RESET_COLOR = "\033[0m";
 
-string currentColor = EMPTY_SPACE_COLOR; // Variable to store the current color
+string currentColor = EMPTY_SPACE_COLOR;
 
 class Grid {
 public:
@@ -149,7 +149,7 @@ int main() {
 
         if (inputMode) {
             string userInput;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear newline
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             getline(cin, userInput);
             string processedInput = processInput(userInput);
             logMessages.push_back(processedInput);
@@ -183,7 +183,7 @@ int main() {
                     cin >> color;
                     changeColor(color);
                 } else if (buttons[buttonIndex] == "Exit") {
-                    system("clear");
+                    cout << "\033[H";
                     break;
                 }
             }
