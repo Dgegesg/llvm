@@ -54,16 +54,16 @@ public:
                 } else {
                     for (int x = 0; x < WIDTH - 2; ++x) {
                         if (x == cursorX && y == cursorY) {
-                            screen += CURSOR_COLOR + CURSOR_CHAR + RESET_COLOR;
+                            screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                         } else {
-                            screen += BUTTON_COLOR + row[x] + RESET_COLOR;
+                            screen += BUTTON_COLOR + string(1, row[x]) + RESET_COLOR;
                         }
                     }
                 }
             } else {
                 for (int x = 0; x < WIDTH - 2; ++x) {
                     if (y == cursorY && x == cursorX) {
-                        screen += CURSOR_COLOR + CURSOR_CHAR + RESET_COLOR;
+                        screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                     } else {
                         screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
