@@ -97,13 +97,13 @@ public:
                 }
             }
 
-            // Render log UI border
+            // Render log UI side by side with the grid
             if (y == 0) {
-                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
+                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
             } else if (y == 1) {
-                screen += "  \033[1m|" + LOG_TITLE + string(LOG_WIDTH - 2 - LOG_TITLE.length(), ' ') + "|\033[0m\n";
+                screen += "  \033[1m|" + LOG_TITLE + string(LOG_WIDTH - 2 - LOG_TITLE.length(), ' ') + "|\033[0m";
             } else if (y == height - 1) {
-                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
+                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
             } else {
                 screen += "  \033[1m|\033[0m";
 
@@ -118,8 +118,10 @@ public:
                     screen += string(LOG_WIDTH - 2, ' ');
                 }
 
-                screen += "\033[1m|\033[0m\n";
+                screen += "\033[1m|\033[0m";
             }
+
+            screen += "\n"; // Move to the next line
         }
 
         // Render labels
