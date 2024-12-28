@@ -40,14 +40,15 @@ public:
             if (y >= 3 && y < 3 + (int)buttons.size()) {
                 int buttonIndex = y - 3;
                 string button = buttons[buttonIndex];
-                string row = string((WIDTH - 2 - button.length()) / 2, EMPTY_CHAR) + button;
-                row += string(WIDTH - 2 - row.length(), EMPTY_CHAR);
+                int buttonStartX = (WIDTH - 2 - button.length()) / 2;
 
                 for (int x = 0; x < WIDTH - 2; ++x) {
                     if (x == cursorX && y == cursorY) {
                         screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
-                    } else if (!(x >= (WIDTH - 2 - button.length()) / 2 && x < (WIDTH + button.length()) / 2 && y == cursorY)) {
-                        screen += BUTTON_COLOR + string(1, row[x]) + RESET_COLOR;
+                    } else if (x >= buttonStartX && x < buttonStartX + button.length() && y == cursorY) {
+                        screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
+                    } else if (x >= buttonStartX && x < buttonStartX + button.length()) {
+                        screen += BUTTON_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
                     } else {
                         screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
