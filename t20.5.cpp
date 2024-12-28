@@ -11,6 +11,7 @@ const int LOG_WIDTH = 20; // Width of the console log area
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "Custom Console UI"; // The title for the UI
+const string LOG_TITLE = "Echo output"; // Title for the log area
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
@@ -97,14 +98,17 @@ public:
             }
 
             // Render log UI border
-            if (y == 0 || y == height - 1) {
+            if (y == 0) {
+                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
+                screen += "  \033[1m|" + LOG_TITLE + string(LOG_WIDTH - 2 - LOG_TITLE.length(), ' ') + "|\033[0m\n";
+            } else if (y == height - 1) {
                 screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
             } else {
                 screen += "  \033[1m|\033[0m";
 
                 // Render log messages inside
-                if (y - 1 < (int)consoleLog.size()) {
-                    string message = consoleLog[y - 1];
+                if (y - 2 < (int)consoleLog.size() && y - 2 >= 0) {
+                    string message = consoleLog[y - 2];
                     if (message.length() > LOG_WIDTH - 2) { // Cut long messages
                         message = message.substr(0, LOG_WIDTH - 2);
                     }
@@ -122,11 +126,14 @@ public:
             int row = label.second.first;
             int col = label.second.second;
             if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-                // Hide the label if the cursor is on it
+                // Hide the character if the cursor is on it
                 if (cursorY == row && cursorX >= col && cursorX < col + (int)label.first.length()) {
-                    continue;
+                    string hiddenLabel = label.first;
+                    hiddenLabel[cursorX - col] = ' '; // Replace character under cursor with space
+                    screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + EMPTY_SPACE_COLOR + hiddenLabel + "\033[0m";
+                } else {
+                    screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + EMPTY_SPACE_COLOR + label.first + "\033[0m"; // Render label with background color
                 }
-                screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + EMPTY_SPACE_COLOR + label.first + "\033[0m"; // Render label with background color
             }
         }
 
@@ -167,7 +174,7 @@ public:
 
     void consoleEcho(string message) {
         // Add message to the log, trimming if necessary
-        if (consoleLog.size() >= HEIGHT - 2) {
+        if (consoleLog.size() >= HEIGHT - 3) {
             consoleLog.erase(consoleLog.begin()); // Remove oldest line if limit exceeded
         }
         consoleLog.push_back(message);  // Add new message
