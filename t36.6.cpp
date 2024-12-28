@@ -45,14 +45,14 @@ public:
                 for (int x = 0; x < WIDTH - 2; ++x) {
                     if (x == cursorX && y == cursorY) {
                         if (x >= buttonStartX && x < buttonStartX + button.length()) {
-                            // Cursor over button text
+                            // Cursor over button text; hide button
                             screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                         } else {
                             // Cursor not on button text
                             screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                         }
-                    } else if (x >= buttonStartX && x < buttonStartX + button.length()) {
-                        // Button text
+                    } else if (x >= buttonStartX && x < buttonStartX + button.length() && !(cursorX >= buttonStartX && cursorX < buttonStartX + button.length() && cursorY == y)) {
+                        // Button text (only if not hidden by cursor)
                         screen += BUTTON_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
                     } else {
                         // Empty space
