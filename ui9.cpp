@@ -3,6 +3,8 @@
 #include <string>
 #include <cstdlib>
 #include <limits>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
@@ -182,6 +184,9 @@ int main() {
         if ((int)logMessages.size() > HEIGHT) {
             logMessages.erase(logMessages.begin());
         }
+
+        // Throttle to avoid excessive screen redraws
+        this_thread::sleep_for(chrono::milliseconds(50));
     }
     cout << "\033[2J";
     return 0;
