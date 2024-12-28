@@ -142,43 +142,51 @@ int main() {
         if (inputMode) {
             string userInput;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            getline(cin, userInput);
-            string processedInput = processInput(userInput);
-            logMessages.push_back(processedInput);
+            try {
+                getline(cin, userInput);
+                string processedInput = processInput(userInput);
+                logMessages.push_back(processedInput);
+            } catch (...) {
+                // Skip processing if an error occurs
+                cout << "Error processing input. Skipping...\n";
+            }
             inputMode = false;
             continue;
         }
 
         char input;
-        cin >> input;
-
-        if (input == 'w' && cursorY > 0) {
-            cursorY--;
-        } else if (input == 's' && cursorY < HEIGHT - 1) {
-            cursorY++;
-        } else if (input == 'a' && cursorX > 0) {
-            cursorX--;
-        } else if (input == 'd' && cursorX < WIDTH - 3) {
-            cursorX++;
-        } else if (input == 'e') {
-            int buttonIndex = cursorY - 3;
-            int buttonStartX = (WIDTH - 2 - buttons[buttonIndex].length()) / 2;
-            if (buttonIndex >= 0 && buttonIndex < (int)buttons.size() && cursorX >= buttonStartX && cursorX < buttonStartX + (int)buttons[buttonIndex].length()) {
-                logMessages.push_back("Selected: " + buttons[buttonIndex]);
-                if (buttons[buttonIndex] == "Input") {
-                    inputMode = true;
-                } else if (buttons[buttonIndex] == "Help") {
-                    logMessages.push_back("Help: Use W/A/S/D to navigate and E to select.");
-                } else if (buttons[buttonIndex] == "Change Color") {
-                    logMessages.push_back("Enter color (red, blue, green, yellow):");
-                    string color;
-                    cin >> color;
-                    changeColor(color);
-                } else if (buttons[buttonIndex] == "Exit") {
-                    cout << "\033[H";
-                    break;
+        try {
+            cin >> input;
+            if (input == 'w' && cursorY > 0) {
+                cursorY--;
+            } else if (input == 's' && cursorY < HEIGHT - 1) {
+                cursorY++;
+            } else if (input == 'a' && cursorX > 0) {
+                cursorX--;
+            } else if (input == 'd' && cursorX < WIDTH - 3) {
+                cursorX++;
+            } else if (input == 'e') {
+                int buttonIndex = cursorY - 3;
+                int buttonStartX = (WIDTH - 2 - buttons[buttonIndex].length()) / 2;
+                if (buttonIndex >= 0 && buttonIndex < (int)buttons.size() && cursorX >= buttonStartX && cursorX < buttonStartX + (int)buttons[buttonIndex].length()) {
+                    logMessages.push_back("Selected: " + buttons[buttonIndex]);
+                    if (buttons[buttonIndex] == "Input") {
+                        inputMode = true;
+                    } else if (buttons[buttonIndex] == "Help") {
+                        logMessages.push_back("Help: Use W/A/S/D to navigate and E to select.");
+                    } else if (buttons[buttonIndex] == "Change Color") {
+                        logMessages.push_back("Enter color (red, blue, green, yellow):");
+                        string color;
+                        cin >> color;
+                        changeColor(color);
+                    } else if (buttons[buttonIndex] == "Exit") {
+                        cout << "\033[H";
+                        break;
+                    }
                 }
             }
+        } catch (...) {
+            cout << "Invalid input. Please enter a valid character.\n";
         }
 
         if ((int)logMessages.size() > HEIGHT) {
