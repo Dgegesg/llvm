@@ -1,7 +1,7 @@
 #include <iostream>
-#include <cstdlib>  // for system("clear")
 #include <vector>
 #include <string>
+#include <cstdlib> // for system("clear")
 
 using namespace std;
 
@@ -24,8 +24,9 @@ public:
     Grid(int width, int height) : width(width), height(height) {}
 
     string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<string>& logMessages) const {
-        string screen = "";
+        string screen;
 
+        // Render Titles
         screen += BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
         screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
 
@@ -67,7 +68,7 @@ public:
                 }
                 screen += EMPTY_SPACE_COLOR + logMessage + string(LOG_WIDTH - 2 - logMessage.length(), ' ') + RESET_COLOR;
             } else {
-                screen += string(LOG_WIDTH - 2, EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR);
+                screen += EMPTY_SPACE_COLOR + string(LOG_WIDTH - 2, EMPTY_CHAR) + RESET_COLOR;
             }
 
             screen += BORDER_COLOR + "|" + RESET_COLOR + "\n";
@@ -86,7 +87,7 @@ private:
 int main() {
     Grid grid(WIDTH, HEIGHT);
 
-    int cursorX = 0, cursorY = 3;
+    int cursorX = WIDTH / 2 - 1, cursorY = 3;
     vector<string> buttons = { "Start", "Options", "Exit" };
     vector<string> logMessages = { "Welcome to the UI!", "Initializing...", "Ready." };
 
@@ -112,6 +113,8 @@ int main() {
                 if (buttons[buttonIndex] == "Exit") {
                     break;
                 }
+            } else {
+                logMessages.push_back("No button selected.");
             }
         }
 
