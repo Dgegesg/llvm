@@ -50,12 +50,24 @@ public:
                 row += string(WIDTH - 2 - row.length(), EMPTY_CHAR);
 
                 if (cursorY == y) {
-                    screen += CURSOR_COLOR + row + RESET_COLOR;
+                    for (int x = 0; x < WIDTH - 2; ++x) {
+                        if (x == cursorX) {
+                            screen += CURSOR_COLOR + CURSOR_CHAR + RESET_COLOR;
+                        } else {
+                            screen += BUTTON_COLOR + row[x] + RESET_COLOR;
+                        }
+                    }
                 } else {
                     screen += BUTTON_COLOR + row + RESET_COLOR;
                 }
             } else {
-                screen += EMPTY_SPACE_COLOR + string(WIDTH - 2, EMPTY_CHAR) + RESET_COLOR;
+                for (int x = 0; x < WIDTH - 2; ++x) {
+                    if (y == cursorY && x == cursorX) {
+                        screen += CURSOR_COLOR + CURSOR_CHAR + RESET_COLOR;
+                    } else {
+                        screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
+                    }
+                }
             }
 
             screen += BORDER_COLOR + "|  |" + RESET_COLOR;
@@ -107,7 +119,7 @@ int main() {
             cursorY++; // Move cursor down
         } else if (input == 'a' && cursorX > 0) {
             cursorX--; // Move cursor left
-        } else if (input == 'd' && cursorX < WIDTH - 2) {
+        } else if (input == 'd' && cursorX < WIDTH - 3) { // Prevent cursor overlap with borders
             cursorX++; // Move cursor right
         } else if (input == 'e') {
             // Perform action based on the button selected
