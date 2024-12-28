@@ -53,7 +53,7 @@ public:
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
 
         // Render log title above the log UI
-        screen += string(WIDTH + 2, ' ') + "\033[1m" + LOG_TITLE + "\033[0m\n";
+        screen += string(WIDTH + 2, ' ') + " \033[1m" + LOG_TITLE + "\033[0m\n";
 
         // Render log border top
         screen += string(WIDTH + 2, ' ') + "\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
@@ -104,16 +104,14 @@ public:
             }
 
             // Render log UI side by side with the grid
-            if (y == 0) {
-                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
-            } else if (y == height - 1) {
+            if (y == 0 || y == height - 1) {
                 screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
             } else {
                 screen += "  \033[1m|\033[0m";
 
                 // Render log messages inside
-                if (y < (int)consoleLog.size() && y >= 0) {
-                    string message = consoleLog[y];
+                if (y - 1 < (int)consoleLog.size() && y - 1 >= 0) {
+                    string message = consoleLog[y - 1];
                     if (message.length() > LOG_WIDTH - 2) { // Cut long messages
                         message = message.substr(0, LOG_WIDTH - 2);
                     }
@@ -132,5 +130,48 @@ public:
         for (const auto& label : labels) {
             int row = label.second.first;
             int col = label.second.second;
-            if (row == 0 && col == 0) {
-             //-
+            if (row >= 0 && row < height && col >= 0 && col < width) {
+                // Append the label at the specified position
+                screen += "\033[" + to_string(row + 1) + ";" + to_string(col + 1) + "H" + label.first;
+            }
+        }
+
+        return screen;
+    }
+
+private:
+    int width, height;
+    char** grid;
+};
+
+int main() {
+    Grid grid(WIDTH, HEIGHT);
+
+    int cursorX = 1, cursorY = 1;
+    vector<string> buttons = { "Start", "Options", "Exit" };
+    vector<pair<int, int>> buttonPositions = { {3, 4}, {4, 4}, {5, 4} };
+    vector<string> consoleLog = { "Welcome to the UI!", "Initializing...", "Ready." };
+    vector<pair<string, pair<int, int>>> labels = { {"Choose an option:", {1, 2}} };
+
+    while (true) {
+        system("clear");
+        cout << grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog, labels);
+
+        char input;
+        cin >> input;
+
+        if (input == 'w' && cursorY > 1) {
+            cursorY--;
+        } else if (input == 's' && cursorY < HEIGHT - 2) {
+            cursorY++;
+        } else if (input == 'a' && cursorX > 1) {
+            cursorX--;
+        } else if (input == 'd' && cursorX < WIDTH - 2) {
+            cursorX++;
+        } else if (input == 'q') {
+            break;
+        }
+    }
+
+    return 0;
+}
