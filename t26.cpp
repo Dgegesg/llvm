@@ -15,8 +15,8 @@ const string LOG_TITLE = "Echo output"; // Title for the log area
 
 // ANSI color codes
 const string EMPTY_SPACE_COLOR = "\033[44m"; // Blue background for empty space
-const string BUTTON_NORMAL_COLOR = "\033[47m"; // Normal button color when cursor is not over it
-const string CURSOR_COLOR = "\033[31m\033[47m"; // Red cursor with white background
+const string BUTTON_NORMAL_COLOR = "\033[34;1m\033[44m"; // Darker blue button with white text
+const string CURSOR_COLOR = "\033[31m\033[44m"; // Red cursor with blue background
 const string CONSOLE_LOG_COLOR = "\033[44m"; // Blue background for console log grid
 
 // Grid class to encapsulate the terminal grid and its drawing
@@ -52,15 +52,8 @@ public:
         // Add the title at the top (above the grid)
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
 
-        // Render log title above the log UI
-        screen += string(WIDTH + 2, ' ') + " \033[1m" + LOG_TITLE + "\033[0m\n";
-
-        // Render log border top
-        screen += string(WIDTH + 2, ' ') + "\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
-
-        // Render grid and log side by side
+        // Render the grid
         for (int y = 0; y < height; ++y) {
-            // Render interactive UI
             for (int x = 0; x < width; ++x) {
                 if ((x == 0 && y == 0) || (x == width - 1 && y == 0) || 
                     (x == 0 && y == height - 1) || (x == width - 1 && y == height - 1)) {
@@ -85,56 +78,52 @@ public:
 
                         if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
                             buttonFound = true;
-
-                            // Show the button normally if not under cursor
-                            if (cursorX >= buttonX && cursorX < buttonX + buttonWidth && cursorY == buttonY) {
-                                screen += EMPTY_SPACE_COLOR + " \033[0m"; // Show empty space instead of button
-                            } else {
-                                screen += BUTTON_NORMAL_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Normal button
-                            }
+                            screen += BUTTON_NORMAL_COLOR + string(1, buttons[i][x - buttonX]) + "\033[0m"; // Dark blue button with white text
                             break;
                         }
                     }
 
                     if (!buttonFound) {
                         // Default empty space
-                        screen += EMPTY_SPACE_COLOR + " \033[0m"; // Apply color to empty space
+                        screen += EMPTY_SPACE_COLOR + " " + "\033[0m"; // Apply color to empty space
                     }
                 }
-            }
-
-            // Render log UI side by side with the grid
-            if (y == 0 || y == height - 1) {
-                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
-            } else {
-                screen += "  \033[1m|\033[0m";
-
-                // Render log messages inside
-                if (y - 1 < (int)consoleLog.size() && y - 1 >= 0) {
-                    string message = consoleLog[y - 1];
-                    if (message.length() > LOG_WIDTH - 2) { // Cut long messages
-                        message = message.substr(0, LOG_WIDTH - 2);
-                    }
-                    screen += CONSOLE_LOG_COLOR + message + string(LOG_WIDTH - 2 - message.length(), ' ') + "\033[0m";
-                } else {
-                    screen += string(LOG_WIDTH - 2, ' ');
-                }
-
-                screen += "\033[1m|\033[0m";
             }
 
             screen += "\n"; // Move to the next line
         }
 
-        // Render labels
+        // Render labels below the grid
         for (const auto& label : labels) {
             int row = label.second.first;
             int col = label.second.second;
-            if (row >= 0 && row < height && col >= 0 && col < width) {
-                // Append the label at the specified position
-                screen += "\033[" + to_string(row + 1) + ";" + to_string(col + 1) + "H" + label.first;
-            }
+            screen += "\033[" + to_string(row) + ";" + to_string(col) + "H" + label.first;
         }
+
+        // Render "Choose an option:" label below the grid
+        screen += "\033[" + to_string(HEIGHT + 2) + ";2HChoose an option:";
+
+        // Render the log area
+        screen += "\n\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n"; // Single top border for log
+        for (int i = 0; i < 5; ++i) {
+            screen += "\033[1m|\033[0m";
+
+            // Render log messages inside
+            if (i < (int)consoleLog.size()) {
+                string message = consoleLog[i];
+                if (message.length() > LOG_WIDTH - 2) { // Cut long messages
+                    message = message.substr(0, LOG_WIDTH - 2);
+                }
+                screen += CONSOLE_LOG_COLOR + message + string(LOG_WIDTH - 2 - message.length(), ' ') + "\033[0m";
+            } else {
+                screen += string(LOG_WIDTH - 2, ' ');
+            }
+
+            screen += "\033[1m|\033[0m\n";
+        }
+
+        // Render log bottom border
+        screen += "\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
 
         return screen;
     }
@@ -151,7 +140,7 @@ int main() {
     vector<string> buttons = { "Start", "Options", "Exit" };
     vector<pair<int, int>> buttonPositions = { {3, 4}, {4, 4}, {5, 4} };
     vector<string> consoleLog = { "Welcome to the UI!", "Initializing...", "Ready." };
-    vector<pair<string, pair<int, int>>> labels = { {"Choose an option:", {1, 2}} };
+    vector<pair<string, pair<int, int>>> labels = {};
 
     while (true) {
         system("clear");
@@ -168,6 +157,18 @@ int main() {
             cursorX--;
         } else if (input == 'd' && cursorX < WIDTH - 2) {
             cursorX++;
+        } else if (input == 'e') {
+            // Check if cursor is on a button and interact
+            for (size_t i = 0; i < buttonPositions.size(); ++i) {
+                int buttonX = buttonPositions[i].second;
+                int buttonY = buttonPositions[i].first;
+                int buttonWidth = buttons[i].length();
+
+                if (cursorY == buttonY && cursorX >= buttonX && cursorX < buttonX + buttonWidth) {
+                    consoleLog.push_back("Selected: " + buttons[i]);
+                    break;
+                }
+            }
         } else if (input == 'q') {
             break;
         }
