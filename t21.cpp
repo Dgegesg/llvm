@@ -52,6 +52,10 @@ public:
         // Add the title at the top (above the grid)
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
 
+        // Render log title above the log UI
+        screen += string(WIDTH + 2, ' ') + "\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
+        screen += string(WIDTH + 2, ' ') + "\033[1m|" + LOG_TITLE + string(LOG_WIDTH - 2 - LOG_TITLE.length(), ' ') + "|\033[0m\n";
+
         // Render grid and log side by side
         for (int y = 0; y < height; ++y) {
             // Render interactive UI
@@ -98,18 +102,14 @@ public:
             }
 
             // Render log UI side by side with the grid
-            if (y == 0) {
-                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
-            } else if (y == 1) {
-                screen += "  \033[1m|" + LOG_TITLE + string(LOG_WIDTH - 2 - LOG_TITLE.length(), ' ') + "|\033[0m";
-            } else if (y == height - 1) {
+            if (y == height - 1) {
                 screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
             } else {
                 screen += "  \033[1m|\033[0m";
 
                 // Render log messages inside
-                if (y - 2 < (int)consoleLog.size() && y - 2 >= 0) {
-                    string message = consoleLog[y - 2];
+                if (y < (int)consoleLog.size() && y >= 0) {
+                    string message = consoleLog[y];
                     if (message.length() > LOG_WIDTH - 2) { // Cut long messages
                         message = message.substr(0, LOG_WIDTH - 2);
                     }
