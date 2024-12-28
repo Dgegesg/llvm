@@ -20,6 +20,8 @@ const string CURSOR_COLOR = "\033[41;97m";
 const string LABEL_COLOR = "\033[44;97m";
 const string RESET_COLOR = "\033[0m";
 
+string currentColor = EMPTY_SPACE_COLOR; // Variable to store the current color
+
 class Grid {
 public:
     Grid(int width, int height) : width(width), height(height) {}
@@ -57,7 +59,7 @@ public:
                         screen += BUTTON_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
                     } else {
                         // Empty space
-                        screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
+                        screen += currentColor + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
                 }
             } else {
@@ -84,7 +86,7 @@ public:
                     if (x == cursorX && y == cursorY) {
                         screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                     } else {
-                        screen += EMPTY_SPACE_COLOR + string(1, EMPTY_CHAR) + RESET_COLOR;
+                        screen += currentColor + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
                 }
             }
@@ -119,11 +121,23 @@ string processInput(const string& input) {
     return "Processed: " + input;
 }
 
+void changeColor(const string& color) {
+    if (color == "red") {
+        currentColor = "\033[41m";
+    } else if (color == "blue") {
+        currentColor = "\033[44m";
+    } else if (color == "green") {
+        currentColor = "\033[42m";
+    } else if (color == "yellow") {
+        currentColor = "\033[43m";
+    }
+}
+
 int main() {
     Grid grid(WIDTH, HEIGHT);
 
     int cursorX = WIDTH / 2 - 1, cursorY = 3;
-    vector<string> buttons = { "Start", "Options", "Input", "Exit" };
+    vector<string> buttons = { "Start", "Options", "Input", "Help", "Change Color", "Exit" };
     vector<pair<int, string>> labels = { {1, "Label: Custom Console UI"}, {2, "Label: Use Arrow Keys"} };
     vector<string> logMessages = { "Welcome to the UI!", "Initializing...", "Ready." };
     bool inputMode = false;
@@ -160,6 +174,13 @@ int main() {
                 logMessages.push_back("Selected: " + buttons[buttonIndex]);
                 if (buttons[buttonIndex] == "Input") {
                     inputMode = true;
+                } else if (buttons[buttonIndex] == "Help") {
+                    logMessages.push_back("Help: Use W/A/S/D to navigate and E to select.");
+                } else if (buttons[buttonIndex] == "Change Color") {
+                    logMessages.push_back("Enter color (red, blue, green, yellow):");
+                    string color;
+                    cin >> color;
+                    changeColor(color);
                 } else if (buttons[buttonIndex] == "Exit") {
                     break;
                 }
