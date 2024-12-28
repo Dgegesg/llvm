@@ -45,7 +45,7 @@ public:
     }
 
     // Renders the grid
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, const vector<string>& consoleLog) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, const vector<string>& consoleLog, const vector<pair<string, pair<int, int>>>& labels) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
@@ -117,6 +117,15 @@ public:
             }
         }
 
+        // Render labels
+        for (const auto& label : labels) {
+            int row = label.second.first;
+            int col = label.second.second;
+            if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
+                screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + label.first; // Position the label
+            }
+        }
+
         return screen; // Return the built string of the UI
     }
 
@@ -180,17 +189,7 @@ private:
     vector<string> consoleLog;  // Console log messages
 
     void renderInteractivePage() {
-        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog);
-        
-        // Render labels
-        for (const auto& label : labels) {
-            int row = label.second.first;
-            int col = label.second.second;
-            if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-                screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + label.first; // Position the label
-            }
-        }
-
+        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog, labels);
         cout << "\033[H" << screen << "Use WASD to move, E to press, Q to quit\n";
     }
 
