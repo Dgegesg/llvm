@@ -7,7 +7,7 @@ using namespace std;
 
 const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
-const int LOG_WIDTH = 20; // Width of the console log area
+const int LOG_WIDTH = 40; // Adjusted log width to match the first UI
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "Custom Console UI"; // The title for the UI
@@ -104,7 +104,9 @@ public:
             }
 
             // Render log UI side by side with the grid
-            if (y == height - 1) {
+            if (y == 0) {
+                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
+            } else if (y == height - 1) {
                 screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m";
             } else {
                 screen += "  \033[1m|\033[0m";
@@ -130,156 +132,5 @@ public:
         for (const auto& label : labels) {
             int row = label.second.first;
             int col = label.second.second;
-            if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-                // Hide the character if the cursor is on it
-                if (cursorY == row && cursorX >= col && cursorX < col + (int)label.first.length()) {
-                    string hiddenLabel = label.first;
-                    hiddenLabel[cursorX - col] = ' '; // Replace character under cursor with space
-                    screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + EMPTY_SPACE_COLOR + hiddenLabel + "\033[0m";
-                } else {
-                    screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + EMPTY_SPACE_COLOR + label.first + "\033[0m"; // Render label with background color
-                }
-            }
-        }
-
-        return screen; // Return the built string of the UI
-    }
-
-    void clear() const {
-        cout << "\033[H\033[J"; // ANSI escape sequence to clear the screen (and move cursor to top-left)
-    }
-
-private:
-    int width, height;
-    char** grid;
-};
-
-class UI {
-public:
-    UI(int width, int height) : grid(width, height), cursorX(1), cursorY(1) {}
-
-    void addButton(string label, int row, int col) {
-        // Ensure button is within the bounds of the grid (not on the border)
-        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-            buttons.push_back(label);
-            buttonPositions.push_back({row, col});  // Track added position
-        } else {
-            cout << "Button '" << label << "' cannot be placed on the border!" << endl;
-        }
-    }
-
-    void addLabel(string label, int row, int col) {
-        // Add a label at a specific position
-        if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-            labels.push_back({label, {row, col}});
-        } else {
-            cout << "Label '" << label << "' cannot be placed on the border!" << endl;
-        }
-    }
-
-    void consoleEcho(string message) {
-        // Add message to the log, trimming if necessary
-        if (consoleLog.size() >= HEIGHT - 3) {
-            consoleLog.erase(consoleLog.begin()); // Remove oldest line if limit exceeded
-        }
-        consoleLog.push_back(message);  // Add new message
-    }
-
-    void run() {
-        grid.clear(); // Clear screen at the start
-
-        char input;
-        while (true) {
-            renderInteractivePage();
-
-            cout << "\033[" << HEIGHT + 3 << ";1HUse WASD to move, E to press:\n"; // Show control text below UI
-            cin >> input;
-            handleInput(input);
-        }
-    }
-
-private:
-    Grid grid;
-    int cursorX, cursorY;
-    vector<string> buttons;  // Button labels
-    vector<pair<int, int>> buttonPositions;  // Button positions (row, col)
-    vector<pair<string, pair<int, int>>> labels; // Labels with positions
-    vector<string> consoleLog;  // Console log messages
-
-    void renderInteractivePage() {
-        string screen = grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog, labels);
-        cout << "\033[H" << screen;
-    }
-
-    void handleInput(char input) {
-        switch (input) {
-            case 'w':  // Move cursor up
-                if (cursorY > 1) cursorY--;
-                break;
-            case 's':  // Move cursor down
-                if (cursorY < HEIGHT - 2) cursorY++;
-                break;
-            case 'a':  // Move cursor left
-                if (cursorX > 1) cursorX--;
-                break;
-            case 'd':  // Move cursor right
-                if (cursorX < WIDTH - 2) cursorX++;
-                break;
-            case 'e':  // Press button under cursor
-                pressButton(cursorX, cursorY);
-                break;
-            default:
-                consoleEcho("Invalid input!");
-                break;
-        }
-    }
-
-    void pressButton(int x, int y) {
-        for (size_t i = 0; i < buttonPositions.size(); ++i) {
-            int buttonX = buttonPositions[i].second;
-            int buttonY = buttonPositions[i].first;
-            int buttonWidth = buttons[i].length(); // Button label width
-
-            // Check if the cursor is inside the button's bounds
-            if (y == buttonY && x >= buttonX && x < buttonX + buttonWidth) {
-                executeButtonAction(i); // Execute corresponding action
-                return;
-            }
-        }
-        consoleEcho("No button at the cursor position!");
-    }
-
-    void executeButtonAction(int index) {
-        switch (index) {
-            case 0:  // "Start"
-                consoleEcho("Starting game...");
-                break;
-            case 1:  // "Options"
-                consoleEcho("Opening options...");
-                break;
-            case 2:  // "Exit"
-                consoleEcho("Exiting...");
-                break;
-            default:
-                consoleEcho("Unknown button action!");
-                break;
-        }
-    }
-};
-
-// Main function to run the UI
-int main() {
-    UI ui(WIDTH, HEIGHT);
-    
-    // Add some buttons
-    ui.addButton("Start", 3, 10);
-    ui.addButton("Options", 4, 10);
-    ui.addButton("Exit", 5, 10);
-
-    // Add some labels
-    ui.addLabel("Welcome!", 1, 5);
-    ui.addLabel("Choose an option:", 2, 5);
-
-    ui.run();
-    return 0;
-}
+            if (row == 0 && col == 0) {
+             //-
