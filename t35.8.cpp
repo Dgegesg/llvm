@@ -87,6 +87,11 @@ private:
     int width, height;
 };
 
+// Function to process user input
+string processInput(const string& input) {
+    return "Processed: " + input;
+}
+
 int main() {
     Grid grid(WIDTH, HEIGHT);
 
@@ -103,7 +108,8 @@ int main() {
             string userInput;
             cin.ignore(); // Clear newline
             getline(cin, userInput);
-            logMessages.push_back("Input: " + userInput);
+            string processedInput = processInput(userInput);
+            logMessages.push_back(processedInput);
             inputMode = false;
             continue;
         }
