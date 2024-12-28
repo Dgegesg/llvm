@@ -17,7 +17,7 @@ const string BORDER_COLOR = "\033[1m";
 const string EMPTY_SPACE_COLOR = "\033[44m";
 const string BUTTON_COLOR = "\033[44;97m";
 const string CURSOR_COLOR = "\033[41;97m";
-const string LABEL_COLOR = "\033[42;97m";
+const string LABEL_COLOR = "\033[44;97m";
 const string RESET_COLOR = "\033[0m";
 
 class Grid {
@@ -68,7 +68,12 @@ public:
                             string labelText = label.second;
                             int labelStartX = (WIDTH - 2 - labelText.length()) / 2;
                             if (x >= labelStartX && x < labelStartX + labelText.length()) {
-                                screen += LABEL_COLOR + string(1, labelText[x - labelStartX]) + RESET_COLOR;
+                                if (x == cursorX && y == cursorY) {
+                                    // Cursor on label
+                                    screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
+                                } else {
+                                    screen += LABEL_COLOR + string(1, labelText[x - labelStartX]) + RESET_COLOR;
+                                }
                                 isLabel = true;
                                 break;
                             }
