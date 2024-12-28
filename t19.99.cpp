@@ -176,7 +176,7 @@ public:
         while (true) {
             renderInteractivePage();
 
-            cout << "\033[" << HEIGHT + 3 << ";1H"; // Move cursor below the UI for input
+            cout << "\033[" << HEIGHT + 3 << ";1HUse WASD to move, E to press:\n"; // Show control text below UI
             cin >> input;
             handleInput(input);
         }
@@ -212,10 +212,6 @@ private:
             case 'e':  // Press button under cursor
                 pressButton(cursorX, cursorY);
                 break;
-            case 'q':  // Quit the program
-                cout << "Exiting..." << endl;
-                exit(0);
-                break;
             default:
                 consoleEcho("Invalid input!");
                 break;
@@ -247,7 +243,6 @@ private:
                 break;
             case 2:  // "Exit"
                 consoleEcho("Exiting...");
-                exit(0);
                 break;
             default:
                 consoleEcho("Unknown button action!");
