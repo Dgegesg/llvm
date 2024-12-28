@@ -30,7 +30,6 @@ public:
     string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, string>>& labels, const vector<string>& logMessages, bool inputMode) const {
         string screen;
 
-        // Render Titles
         string title = inputMode ? "\033[KWe need your input data to process: \n\033[J" : "\033[KCursor control (wasd) input: \n\033[J";
         screen += "\033[K" + BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
         screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
@@ -48,13 +47,10 @@ public:
 
                 for (int x = 0; x < WIDTH - 2; ++x) {
                     if (x == cursorX && y == cursorY) {
-                        // Cursor over button row; hide the button entirely and show the cursor
                         screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                     } else if (x >= buttonStartX && x < buttonStartX + button.length() && !(y == cursorY)) {
-                        // Button text (only visible if cursor is not on this row)
                         screen += BUTTON_COLOR + string(1, button[x - buttonStartX]) + RESET_COLOR;
                     } else {
-                        // Empty space
                         screen += currentColor + string(1, EMPTY_CHAR) + RESET_COLOR;
                     }
                 }
@@ -67,7 +63,6 @@ public:
                             int labelStartX = (WIDTH - 2 - labelText.length()) / 2;
                             if (x >= labelStartX && x < labelStartX + labelText.length()) {
                                 if (x == cursorX && y == cursorY) {
-                                    // Cursor on label
                                     screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                                 } else {
                                     screen += LABEL_COLOR + string(1, labelText[x - labelStartX]) + RESET_COLOR;
