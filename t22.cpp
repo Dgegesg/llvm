@@ -53,8 +53,8 @@ public:
         screen += "\033[1m" + TITLE + "\033[0m\n";  // Bold title
 
         // Render log title above the log UI
+        screen += string(WIDTH + 2, ' ') + "\033[1m" + LOG_TITLE + "\033[0m\n";
         screen += string(WIDTH + 2, ' ') + "\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
-        screen += string(WIDTH + 2, ' ') + "\033[1m|" + LOG_TITLE + string(LOG_WIDTH - 2 - LOG_TITLE.length(), ' ') + "|\033[0m\n";
 
         // Render grid and log side by side
         for (int y = 0; y < height; ++y) {
