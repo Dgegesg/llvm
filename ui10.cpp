@@ -3,8 +3,8 @@
 #include <string>
 #include <cstdlib>
 #include <limits>
-#include <thread>
 #include <chrono>
+#include <unistd.h>  // For usleep
 
 using namespace std;
 
@@ -186,7 +186,7 @@ int main() {
         }
 
         // Throttle to avoid excessive screen redraws
-        this_thread::sleep_for(chrono::milliseconds(50));
+        usleep(50000);  // Using usleep instead of sleep for older platforms
     }
     cout << "\033[2J";
     return 0;
