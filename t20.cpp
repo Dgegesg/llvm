@@ -122,7 +122,11 @@ public:
             int row = label.second.first;
             int col = label.second.second;
             if (row > 0 && row < HEIGHT - 1 && col > 0 && col < WIDTH - 1) {
-                screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + label.first; // Position the label
+                // Hide the label if the cursor is on it
+                if (cursorY == row && cursorX >= col && cursorX < col + (int)label.first.length()) {
+                    continue;
+                }
+                screen += "\033[" + to_string(row + 2) + ";" + to_string(col + 1) + "H" + EMPTY_SPACE_COLOR + label.first + "\033[0m"; // Render label with background color
             }
         }
 
