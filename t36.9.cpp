@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int WIDTH = 30;
+const int WIDTH = 40;
 const int HEIGHT = 10;
 const int LOG_WIDTH = 30;
 const char EMPTY_CHAR = ' ';
@@ -30,7 +30,7 @@ public:
         string screen;
 
         // Render Titles
-        string title = inputMode ? "Input:" : "Choose an option:";
+        string title = inputMode ? "Input:" : "Cursor control (wasd) input:";
         screen += BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
         screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
 
@@ -182,6 +182,7 @@ int main() {
                     cin >> color;
                     changeColor(color);
                 } else if (buttons[buttonIndex] == "Exit") {
+                    system("clear");
                     break;
                 }
             }
