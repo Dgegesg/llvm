@@ -32,7 +32,7 @@ public:
 
     // Render Titles
     cout << "\033[H";
-    string title = inputMode ? "Input: " : "Cursor control (wasd) input: ";
+    string title = inputMode ? "We need your input data to process: \n" : "Cursor control (wasd) input: \n";
     screen += BORDER_COLOR + MAIN_TITLE + string(WIDTH - MAIN_TITLE.length(), ' ') + "  " + LOG_TITLE + RESET_COLOR + "\n";
     screen += BORDER_COLOR + "+" + string(WIDTH - 2, '-') + "+  +" + string(LOG_WIDTH - 2, '-') + "+" + RESET_COLOR + "\n";
 
