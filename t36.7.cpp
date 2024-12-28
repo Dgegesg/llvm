@@ -17,13 +17,14 @@ const string BORDER_COLOR = "\033[1m";
 const string EMPTY_SPACE_COLOR = "\033[44m";
 const string BUTTON_COLOR = "\033[44;97m";
 const string CURSOR_COLOR = "\033[41;97m";
+const string LABEL_COLOR = "\033[42;97m";
 const string RESET_COLOR = "\033[0m";
 
 class Grid {
 public:
     Grid(int width, int height) : width(width), height(height) {}
 
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<string>& logMessages, bool inputMode) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, string>>& labels, const vector<string>& logMessages, bool inputMode) const {
         string screen;
 
         // Render Titles
@@ -61,6 +62,20 @@ public:
                 }
             } else {
                 for (int x = 0; x < WIDTH - 2; ++x) {
+                    bool isLabel = false;
+                    for (const auto& label : labels) {
+                        if (label.first == y) {
+                            string labelText = label.second;
+                            int labelStartX = (WIDTH - 2 - labelText.length()) / 2;
+                            if (x >= labelStartX && x < labelStartX + labelText.length()) {
+                                screen += LABEL_COLOR + string(1, labelText[x - labelStartX]) + RESET_COLOR;
+                                isLabel = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (isLabel) continue;
+
                     if (x == cursorX && y == cursorY) {
                         screen += CURSOR_COLOR + string(1, CURSOR_CHAR) + RESET_COLOR;
                     } else {
@@ -104,12 +119,13 @@ int main() {
 
     int cursorX = WIDTH / 2 - 1, cursorY = 3;
     vector<string> buttons = { "Start", "Options", "Input", "Exit" };
+    vector<pair<int, string>> labels = { {1, "Label: Custom Console UI"}, {2, "Label: Use Arrow Keys"} };
     vector<string> logMessages = { "Welcome to the UI!", "Initializing...", "Ready." };
     bool inputMode = false;
 
     while (true) {
         system("clear");
-        cout << grid.render(cursorX, cursorY, buttons, logMessages, inputMode);
+        cout << grid.render(cursorX, cursorY, buttons, labels, logMessages, inputMode);
 
         if (inputMode) {
             string userInput;
