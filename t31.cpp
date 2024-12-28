@@ -101,14 +101,18 @@ int main() {
         char input;
         cin >> input;
 
-        if (input == 'w' && cursorY > 3) {
+        if (input == 'w' && cursorY > 0) {
             cursorY--; // Move cursor up
-        } else if (input == 's' && cursorY < 3 + (int)buttons.size() - 1) {
+        } else if (input == 's' && cursorY < HEIGHT - 1) {
             cursorY++; // Move cursor down
+        } else if (input == 'a' && cursorX > 0) {
+            cursorX--; // Move cursor left
+        } else if (input == 'd' && cursorX < WIDTH - 2) {
+            cursorX++; // Move cursor right
         } else if (input == 'e') {
             // Perform action based on the button selected
             int buttonIndex = cursorY - 3;
-            if (buttonIndex >= 0 && buttonIndex < (int)buttons.size()) {
+            if (buttonIndex >= 0 && buttonIndex < (int)buttons.size() && cursorX >= (WIDTH - buttons[buttonIndex].length()) / 2 && cursorX < (WIDTH + buttons[buttonIndex].length()) / 2) {
                 logMessages.push_back("Selected: " + buttons[buttonIndex]);
                 if (buttons[buttonIndex] == "Exit") {
                     break; // Exit the program
