@@ -7,7 +7,7 @@ using namespace std;
 
 const int WIDTH = 40;  // Width of the screen
 const int HEIGHT = 10; // Height of the screen
-const int LOG_WIDTH = 40; // Adjusted log width to match the first UI
+const int LOG_WIDTH = 30; // Width of the log UI
 const char EMPTY_CHAR = ' '; // Default empty space in grid
 const char CURSOR_CHAR = 'X'; // Cursor character
 const string TITLE = "Custom Console UI"; // The title for the UI
@@ -46,7 +46,7 @@ public:
     }
 
     // Renders the grid
-    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, const vector<string>& consoleLog, const vector<pair<string, pair<int, int>>>& labels) const {
+    string render(int cursorX, int cursorY, const vector<string>& buttons, const vector<pair<int, int>>& buttonPositions, const vector<string>& consoleLog) const {
         string screen = ""; // Empty string to accumulate grid content
 
         // Add the title at the top (above the grid)
@@ -90,40 +90,33 @@ public:
                 }
             }
 
-            screen += "\n"; // Move to the next line
-        }
+            // Render the log area on the right side
+            if (y == 0) {
+                screen += "  \033[1m" + LOG_TITLE + "\033[0m\n"; // Log title
+                screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n"; // Top border of log
+            } else if (y == height - 1) {
+                screen += "\n  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m"; // Bottom border of log
+            } else {
+                screen += "  \033[1m|\033[0m";
 
-        // Render labels below the grid
-        for (const auto& label : labels) {
-            int row = label.second.first;
-            int col = label.second.second;
-            screen += "\033[" + to_string(row) + ";" + to_string(col) + "H" + label.first;
+                // Render log messages inside
+                int logIndex = y - 1;
+                if (logIndex < (int)consoleLog.size()) {
+                    string message = consoleLog[logIndex];
+                    if (message.length() > LOG_WIDTH - 2) { // Cut long messages
+                        message = message.substr(0, LOG_WIDTH - 2);
+                    }
+                    screen += CONSOLE_LOG_COLOR + message + string(LOG_WIDTH - 2 - message.length(), ' ') + "\033[0m";
+                } else {
+                    screen += string(LOG_WIDTH - 2, ' ');
+                }
+
+                screen += "\033[1m|\033[0m\n";
+            }
         }
 
         // Render "Choose an option:" label below the grid
         screen += "\033[" + to_string(HEIGHT + 2) + ";2HChoose an option:";
-
-        // Render the log area
-        screen += "\n\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n"; // Single top border for log
-        for (int i = 0; i < 5; ++i) {
-            screen += "\033[1m|\033[0m";
-
-            // Render log messages inside
-            if (i < (int)consoleLog.size()) {
-                string message = consoleLog[i];
-                if (message.length() > LOG_WIDTH - 2) { // Cut long messages
-                    message = message.substr(0, LOG_WIDTH - 2);
-                }
-                screen += CONSOLE_LOG_COLOR + message + string(LOG_WIDTH - 2 - message.length(), ' ') + "\033[0m";
-            } else {
-                screen += string(LOG_WIDTH - 2, ' ');
-            }
-
-            screen += "\033[1m|\033[0m\n";
-        }
-
-        // Render log bottom border
-        screen += "\033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
 
         return screen;
     }
@@ -140,11 +133,10 @@ int main() {
     vector<string> buttons = { "Start", "Options", "Exit" };
     vector<pair<int, int>> buttonPositions = { {3, 4}, {4, 4}, {5, 4} };
     vector<string> consoleLog = { "Welcome to the UI!", "Initializing...", "Ready." };
-    vector<pair<string, pair<int, int>>> labels = {};
 
     while (true) {
         system("clear");
-        cout << grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog, labels);
+        cout << grid.render(cursorX, cursorY, buttons, buttonPositions, consoleLog);
 
         char input;
         cin >> input;
