@@ -1,11 +1,5 @@
-#!/bin/sh
+stty -icanon min 1
+char=$(head -c 1 | tr -d '\n')
+stty icanon
 
-# Define the port to listen on
-PORT=8080
-
-# Start listening for HTTP requests
-while true; do
-    # Use nc (netcat) to listen for incoming connections on the given port
-    # and pipe the request to the C++ backend
-    nc -lk $PORT | ./backend
-done
+echo "You pressed: $char"
