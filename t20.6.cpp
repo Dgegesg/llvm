@@ -100,6 +100,7 @@ public:
             // Render log UI border
             if (y == 0) {
                 screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
+            } else if (y == 1) {
                 screen += "  \033[1m|" + LOG_TITLE + string(LOG_WIDTH - 2 - LOG_TITLE.length(), ' ') + "|\033[0m\n";
             } else if (y == height - 1) {
                 screen += "  \033[1m+" + string(LOG_WIDTH - 2, '-') + "+\033[0m\n";
@@ -254,7 +255,6 @@ private:
                 break;
             case 2:  // "Exit"
                 consoleEcho("Exiting...");
-                exit(0);
                 break;
             default:
                 consoleEcho("Unknown button action!");
