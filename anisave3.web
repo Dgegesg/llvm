@@ -73,8 +73,8 @@
                     const starSpan = doc.createElement('span');
                     const deleteButton = doc.createElement('button');
                     const starsplit = item.split(' | star: ')
-                    contentP.textContent = item[0];
-                    starSpan.textContent = `${"★".repeat(Number(item[1]))} (${item[1]})`;
+                    contentP.textContent = starsplit[0];
+                    starSpan.textContent = `${"★".repeat(Number(starsplit[1]))} (${starsplit[1]})`;
                     deleteButton.textContent = '🗑';
                     deleteButton.id = 'delete';
     
