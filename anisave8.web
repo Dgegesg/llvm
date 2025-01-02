@@ -45,7 +45,7 @@
     </div>
 
     <div id="comment">
-        <textarea id="query"></textarea>
+        <input id="query"></input>
         <div id="dropdown">
             <button id="starselect">Rate</button>
             <div id="stardropdown"></div>
