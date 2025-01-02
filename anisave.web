@@ -64,8 +64,11 @@
             xhr.setRequestHeader("Content-Type", "text/html")
             xhr.send()
         }
-        
-        alert(await updatedb())
+        async function getdata() {
+            const data = await updatedb()
+            return data
+        }
+        alert(getdata())
     </script>
 </body>
 </html>
