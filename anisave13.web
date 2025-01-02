@@ -16,14 +16,21 @@
         nav {
             display: flex;
             align-items: center;
-            padding: 10px;
-            background-color: #333;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #333, #444);
             color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            justify-content: space-between;
         }
 
         nav img {
-            width: 40px;
+            width: 50px;
             height: auto;
+        }
+
+        nav h1 {
+            margin: 0;
+            font-size: 24px;
         }
 
         #alert, #comment, #load {
@@ -42,8 +49,12 @@
             margin-bottom: 10px;
         }
 
+        #stardropdown {
+            display: flex;
+            gap: 5px;
+        }
+
         #stardropdown button {
-            margin: 2px;
             padding: 10px;
             background-color: #f0f0f0;
             border: none;
@@ -99,27 +110,68 @@
         #send:hover {
             background-color: #218838;
         }
+
+        #alert button {
+            background-color: #ff5b5b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        #alert p {
+            margin: 10px 0;
+        }
+
+        #search {
+            display: flex;
+            gap: 10px;
+        }
+
+        #search input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #search select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <img src="logo.png" alt="Anisave Logo"> Anisave
+        <img src="logo.png" alt="Anisave Logo"> 
+        <h1>Anisave</h1>
     </nav>
 
-    <div id="alert">
+    <div id="alert" style="display: none;">
         <h2>Alert</h2>
-        <p>dqdqdwdqfqw<br>fqwf<br>wqf<br>qwfwfqfqfqwf</p>
+        <p></p>
         <button>⛌</button>
     </div>
 
     <div id="comment">
         <input id="query" placeholder="Enter your comment..."></input>
-        <div id="dropdown">
-            <button id="starselect">Rate</button>
-            <div id="stardropdown"></div>
-        </div>
+        <div id="stardropdown"></div><br>
         <button id="send">Submit</button>
+    </div>
+
+    <div id="search">
+        <input type="text" id="searchInput" placeholder="Search comments...">
+        <select id="starFilter">
+            <option value="">All Stars</option>
+            <option value="1">1 ★</option>
+            <option value="2">2 ★★</option>
+            <option value="3">3 ★★★</option>
+            <option value="4">4 ★★★★</option>
+            <option value="5">5 ★★★★★</option>
+        </select>
     </div>
 
     <div id="load"></div>
@@ -128,13 +180,18 @@
         const doc = document;
         const stardropdown = doc.getElementById("stardropdown");
         const loaddata = doc.getElementById("load");
+        const alertBox = doc.getElementById("alert");
+        const searchInput = doc.getElementById("searchInput");
+        const starFilter = doc.getElementById("starFilter");
 
-        // Render star rating buttons
+        // Function to render star rating buttons
         function renderStars() {
+            stardropdown.innerHTML = '';
             for (let star = 1; star <= 5; star++) {
                 const buttonstar = doc.createElement("button");
                 buttonstar.textContent = `${star} ★`;
                 buttonstar.id = `${star}star`;
+                if (star === 1) buttonstar.classList.add('active'); // Default star rating is 1
                 stardropdown.appendChild(buttonstar);
             }
         }
@@ -146,12 +203,16 @@
         const dburl = "/db";
 
         // Function to fetch and display comments
-        function updatedb(query = "") {
+        function updatedb(query = "", star = "") {
             const xhr = new XMLHttpRequest();
-            xhr.open("GET", `${dburl}?query=${encodeURIComponent(query)}`, true);
+            xhr.open("GET", `${dburl}?query=${encodeURIComponent(query)}&star=${star}`, true);
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    displayData(xhr.responseText);
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        displayData(xhr.responseText);
+                    } else {
+                        showAlert("An error occurred while loading the data.");
+                    }
                 }
             };
             xhr.setRequestHeader("Content-Type", "text/html");
@@ -203,8 +264,12 @@
             const xhr = new XMLHttpRequest();
             xhr.open("GET", apiUrl, true);
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    updatedb();
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        updatedb();
+                    } else {
+                        showAlert("An error occurred while saving the data.");
+                    }
                 }
             };
             xhr.send();
@@ -216,8 +281,12 @@
             const xhr = new XMLHttpRequest();
             xhr.open("GET", apiUrl, true);
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    updatedb();
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        updatedb();
+                    } else {
+                        showAlert("An error occurred while deleting the data.");
+                    }
                 }
             };
             xhr.send();
@@ -240,6 +309,49 @@
                 const deletedata = e.target.parentElement;
                 deldb(deletedata.data, deletedata.star);
             }
+        });
+
+        // Function to show custom alert
+        function showAlert(message) {
+            alertBox.style.display = 'block';
+            alertBox.querySelector('p').textContent = message;
+        }
+
+        // Close the alert box when "⛌" is clicked
+        alertBox.querySelector('button').addEventListener("click", () => {
+            alertBox.style.display = 'none';
+        });
+
+        // Search functionality with star filter
+        searchInput.addEventListener("input", function() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedStar = starFilter.value;
+            const comments = doc.querySelectorAll('.dataonload');
+            comments.forEach(comment => {
+                const text = comment.querySelector('p').textContent.toLowerCase();
+                const star = comment.star;
+                if (text.includes(searchTerm) && (selectedStar === "" || star === selectedStar)) {
+                    comment.style.display = 'flex';
+                } else {
+                    comment.style.display = 'none';
+                }
+            });
+        });
+
+        // Star filter functionality
+        starFilter.addEventListener("change", function() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedStar = starFilter.value;
+            const comments = doc.querySelectorAll('.dataonload');
+            comments.forEach(comment => {
+                const text = comment.querySelector('p').textContent.toLowerCase();
+                const star = comment.star;
+                if (text.includes(searchTerm) && (selectedStar === "" || star === selectedStar)) {
+                    comment.style.display = 'flex';
+                } else {
+                    comment.style.display = 'none';
+                }
+            });
         });
 
     </script>
