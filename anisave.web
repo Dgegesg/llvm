@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anisave</title>
+    <link href="/anisave.css" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <img></img> Anisave
+    </nav>
+    <div id="alert">
+        <br>
+        <alerttitle>Alert</alerttitle>
+        <alertcaption>
+            <p>
+                dqdqdwdqfqw
+                fqwf
+                wqf
+                qwfwfqfqfqwf
+            </p>
+        </alertcaption>
+        <button>⛌</button>
+        <br>
+    </div>
+    <comment>
+        <textarea id="query"></textarea> <dropdown><button id="starselect">Rate</button><div><div id="stardropdown">
+        </div></div></dropdown><br><button id="send">Submit</button>
+    </comment>
+    <load>
+        <div id="load">
+            <div>
+                <comment><p id="content">qdqwdqwdqwdqwfqwfqwf</p></comment><br>
+                <star id="starrate">★★★★★ (5)</star> <button id="delete">🗑</button>
+            </div>
+        </div>
+    </load>
+    <script>
+        const doc = document
+const stardropdown = doc.getElementById("stardropdown")
+
+//Rate element generate
+for (let star = 1; star <= 5; star++) {
+    const buttonstar = doc.createElement("button")
+    buttonstar.textContent = star + " ★"
+    buttonstar.id = star + "star"
+    stardropdown.appendChild(buttonstar)
+    const br = doc.createElement("br")
+    stardropdown.appendChild(br)
+    console.log(star)
+}
+
+//API
+const dburl = "/db"
+function updatedb() {
+    const xhr = new XMLHttpRequest()
+    xhr.open("GET", dburl, true)
+    xhr.onreadystatechange = function() {
+        if (xhr.status === 200) {
+            return xhr.responseText
+        }   
+    }
+    xhr.setRequestHeader("Content-Type", "text/html")
+    xhr.send()
+}
+
+alert(updatedb())
+    </script>
+</body>
+</html>
