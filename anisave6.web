@@ -77,10 +77,12 @@
                     starSpan.textContent = ` (${starsplit[1]}) ${"★".repeat(Number(starsplit[1]))}`
                     deleteButton.textContent = '🗑'
                     deleteButton.id = 'delete'
-    
+                    commentDiv.id = "datanum" + item_num
+                    commentDiv.data = item
                     commentDiv.classList.add('dataonload')
                     commentDiv.appendChild(contentP)
                     commentDiv.appendChild(starSpan)
+                    commentDiv.appendChild(doc.createElement('br'))
                     commentDiv.appendChild(doc.createElement('br'))
                     commentDiv.appendChild(deleteButton)
                     loaddata.appendChild(commentDiv)
@@ -90,6 +92,10 @@
 
         // Fetch and render data
         updatedb()
+
+        function savedb() {
+
+        }
     </script>
 </body>
 </html>
