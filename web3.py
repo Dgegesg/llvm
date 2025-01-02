@@ -10,6 +10,7 @@ ffmpeg_command = [
     "-i", url,
     "-c", "copy",
     "-bsf:a", "aac_adtstoasc",
+    "-threads", "4",  # Number of threads (adjust as needed for your system)
     output_file
 ]
 
