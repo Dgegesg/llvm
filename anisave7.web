@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anisave</title>
+    <link href="/css" rel="stylesheet">
+    <style>
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+        nav img {
+            width: 40px;
+            height: auto;
+        }
+        #alert, #comment, #load {
+            margin: 20px;
+        }
+        #comment textarea {
+            width: 100%;
+            height: 100px;
+        }
+        #stardropdown button {
+            margin: 2px;
+        }
+        .dataonload {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <img src="logo.png" alt="Anisave Logo"> Anisave
+    </nav>
+
+    <div id="alert">
+        <h2>Alert</h2>
+        <p>dqdqdwdqfqw<br>fqwf<br>wqf<br>qwfwfqfqfqwf</p>
+        <button>⛌</button>
+    </div>
+
+    <div id="comment">
+        <textarea id="query"></textarea>
+        <div id="dropdown">
+            <button id="starselect">Rate</button>
+            <div id="stardropdown"></div>
+        </div>
+        <button id="send">Submit</button>
+    </div>
+
+    <div id="load"></div>
+
+    <script>
+        const doc = document;
+        const stardropdown = doc.getElementById("stardropdown");
+        const loaddata = doc.getElementById("load");
+
+        // Render star rating buttons
+        function renderStars() {
+            for (let star = 1; star <= 5; star++) {
+                const buttonstar = doc.createElement("button");
+                buttonstar.textContent = `${star} ★`;
+                buttonstar.id = `${star}star`;
+                stardropdown.appendChild(buttonstar);
+            }
+        }
+
+        // Initialize star rating buttons
+        renderStars();
+
+        // API URL
+        const dburl = "/db";
+
+        // Function to fetch and display comments
+        function updatedb() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", dburl, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    displayData(xhr.responseText);
+                }
+            };
+            xhr.setRequestHeader("Content-Type", "text/html");
+            xhr.send();
+        }
+
+        // Function to render comments
+        function displayData(data) {
+            loaddata.textContent = '';
+            const updatesplit = data.split("\n");
+            updatesplit.forEach((item, item_num) => {
+                if (item != "") {
+                    const commentDiv = doc.createElement('div');
+                    const contentP = doc.createElement('p');
+                    const starSpan = doc.createElement('span');
+                    const deleteButton = doc.createElement('button');
+                    const starsplit = item.split(' | star: ');
+                    contentP.textContent = starsplit[0];
+                    starSpan.textContent = ` (${starsplit[1]}) ${"★".repeat(Number(starsplit[1]))}`;
+                    deleteButton.textContent = '🗑';
+                    deleteButton.id = 'delete';
+                    commentDiv.id = "datanum" + item_num;
+                    commentDiv.classList.add('dataonload');
+                    commentDiv.appendChild(contentP);
+                    commentDiv.appendChild(starSpan);
+                    commentDiv.appendChild(doc.createElement('br'));
+                    commentDiv.appendChild(doc.createElement('br'));
+                    commentDiv.appendChild(deleteButton);
+                    loaddata.appendChild(commentDiv);
+                }
+            });
+        }
+
+        // Fetch data
+        updatedb();
+
+        // Function to save data
+        function savedb() {
+            const query = doc.getElementById("query").value;
+            const star = doc.querySelector("#stardropdown button.active")?.id?.replace('star', '');
+            const apiUrl = `/db?data=save&star=${star}&label=${encodeURIComponent(query)}`;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", apiUrl, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    updatedb();
+                }
+            };
+            xhr.send();
+        }
+
+        
+
+
+        // Event listener for star selection
+        doc.querySelectorAll("#stardropdown button").forEach(starBtn => {
+            starBtn.addEventListener("click", () => {
+                doc.querySelectorAll("#stardropdown button").forEach(btn => btn.classList.remove('active'));
+                starBtn.classList.add('active');
+            });
+        });
+
+        // Event listener for Submit button
+        doc.getElementById("send").addEventListener("click", savedb);
+
+        // Event listener for Delete button
+        doc.addEventListener("click", function(e) {
+            if (e.target && e.target.id === "delete") {
+               console.log("test")
+            }
+        });
+
+    </script>
+
+</body>
+</html>
