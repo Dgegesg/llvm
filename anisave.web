@@ -71,7 +71,7 @@
             viaapi.then(data => {
                 loaddata.textContent = ""
                 const updatesplit = data.split("\n")
-                updatesplit.array.forEach(item => {
+                updatesplit.forEach(item => {
                     console.log(item)
                 });
             }).catch(error => {
