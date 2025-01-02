@@ -105,6 +105,8 @@
                     deleteButton.textContent = '🗑';
                     deleteButton.id = 'delete';
                     commentDiv.id = "datanum" + item_num;
+                    commentDiv.star = starsplit[1]
+                    commentDiv.data = starsplit[0]
                     commentDiv.classList.add('dataonload');
                     commentDiv.appendChild(contentP);
                     commentDiv.appendChild(starSpan);
@@ -134,9 +136,18 @@
             };
             xhr.send();
         }
+        function deldb(query, star) {
+            const apiUrl = `/db?data=save&star=${star}&label=${encodeURIComponent(query)}`;
 
-        
-
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", apiUrl, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    updatedb();
+                }
+            };
+            xhr.send();
+        }
 
         // Event listener for star selection
         doc.querySelectorAll("#stardropdown button").forEach(starBtn => {
@@ -152,7 +163,7 @@
         // Event listener for Delete button
         doc.addEventListener("click", function(e) {
             if (e.target && e.target.id === "delete") {
-               console.log("test")
+               console.log(e.target.star, e.target.data)
             }
         });
 
