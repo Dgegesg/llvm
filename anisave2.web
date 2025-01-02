@@ -30,14 +30,6 @@
     </div>
 
     <div id="load">
-        <div>
-            <div class="comment-item">
-                <p id="content">qdqwdqwdqwdqwfqwfqwf</p>
-                <br>
-                <span id="starrate">★★★★★ (5)</span>
-                <button id="delete">🗑</button>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -45,7 +37,7 @@
         const stardropdown = doc.getElementById("stardropdown");
         const loaddata = doc.getElementById("load");
 
-        // Generate rating buttons
+        // Render rating
         for (let star = 1; star <= 5; star++) {
             const buttonstar = doc.createElement("button");
             buttonstar.textContent = `${star} ★`;
@@ -55,7 +47,7 @@
             stardropdown.appendChild(br);
         }
 
-        // API call for updating database using XMLHttpRequest
+        // API
         const dburl = "/db";
 
         function updatedb() {
@@ -70,27 +62,28 @@
             xhr.send();
         }
 
-        // Function to display data
+        // Render data
         function displayData(data) {
-            loaddata.innerHTML = '';
+            loaddata.textContent = '';
             const updatesplit = data.split("\n");
-            updatesplit.forEach(item => {
-                const commentDiv = doc.createElement('div');
-                const contentP = doc.createElement('p');
-                const starSpan = doc.createElement('span');
-                const deleteButton = doc.createElement('button');
-
-                contentP.textContent = item;
-                starSpan.textContent = '★★★★★ (5)';
-                deleteButton.textContent = '🗑';
-                deleteButton.id = 'delete';
-
-                commentDiv.classList.add('comment-item');
-                commentDiv.appendChild(contentP);
-                commentDiv.appendChild(starSpan);
-                commentDiv.appendChild(deleteButton);
-
-                loaddata.appendChild(commentDiv);
+            updatesplit.forEach((item, item_num) => {
+                if (item != ""){
+                    const commentDiv = doc.createElement('div');
+                    const contentP = doc.createElement('p');
+                    const starSpan = doc.createElement('span');
+                    const deleteButton = doc.createElement('button');
+                    const starsplit = item.split(' | star: ')
+                    contentP.textContent = item[0];
+                    starSpan.textContent = `${"★".repeat(Number(item[1]))} (${item[1]})`;
+                    deleteButton.textContent = '🗑';
+                    deleteButton.id = 'delete';
+    
+                    commentDiv.classList.add('dataonload');
+                    commentDiv.appendChild(contentP);
+                    commentDiv.appendChild(starSpan);
+                    commentDiv.appendChild(deleteButton);
+                    loaddata.appendChild(commentDiv);
+                }
             });
         }
 
