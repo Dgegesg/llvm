@@ -137,7 +137,7 @@
             xhr.send();
         }
         function deldb(query, star) {
-            const apiUrl = `/db?data=save&star=${star}&label=${encodeURIComponent(query)}`;
+            const apiUrl = `/db?data=del&star=${star}&label=${encodeURIComponent(query)}`;
 
             const xhr = new XMLHttpRequest();
             xhr.open("GET", apiUrl, true);
