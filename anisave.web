@@ -38,34 +38,34 @@
     </load>
     <script>
         const doc = document
-const stardropdown = doc.getElementById("stardropdown")
-
-//Rate element generate
-for (let star = 1; star <= 5; star++) {
-    const buttonstar = doc.createElement("button")
-    buttonstar.textContent = star + " ★"
-    buttonstar.id = star + "star"
-    stardropdown.appendChild(buttonstar)
-    const br = doc.createElement("br")
-    stardropdown.appendChild(br)
-    console.log(star)
-}
-
-//API
-const dburl = "/db"
-function updatedb() {
-    const xhr = new XMLHttpRequest()
-    xhr.open("GET", dburl, true)
-    xhr.onreadystatechange = function() {
-        if (xhr.status === 200) {
-            return xhr.responseText
-        }   
-    }
-    xhr.setRequestHeader("Content-Type", "text/html")
-    xhr.send()
-}
-
-alert(updatedb())
+        const stardropdown = doc.getElementById("stardropdown")
+        
+        //Rate element generate
+        for (let star = 1; star <= 5; star++) {
+            const buttonstar = doc.createElement("button")
+            buttonstar.textContent = star + " ★"
+            buttonstar.id = star + "star"
+            stardropdown.appendChild(buttonstar)
+            const br = doc.createElement("br")
+            stardropdown.appendChild(br)
+            console.log(star)
+        }
+        
+        //API
+        const dburl = "/db"
+        async function updatedb() {
+            const xhr = new XMLHttpRequest()
+            xhr.open("GET", dburl, true)
+            xhr.onreadystatechange = function() {
+                if (xhr.status === 200) {
+                    return xhr.responseText
+                }   
+            }
+            xhr.setRequestHeader("Content-Type", "text/html")
+            xhr.send()
+        }
+        
+        alert(await updatedb())
     </script>
 </body>
 </html>
