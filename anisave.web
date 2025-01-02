@@ -68,7 +68,7 @@
             const data = await updatedb()
             return data
         }
-        alert(getdata())
+        console.log(getdata())
     </script>
 </body>
 </html>
