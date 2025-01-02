@@ -39,7 +39,7 @@
     <script>
         const doc = document
         const stardropdown = doc.getElementById("stardropdown")
-        
+        const loaddata = doc.getElementById("load")
         //Rate element generate
         for (let star = 1; star <= 5; star++) {
             const buttonstar = doc.createElement("button")
@@ -64,11 +64,20 @@
             xhr.setRequestHeader("Content-Type", "text/html")
             xhr.send()
         }
+        
+        // Data generate
         async function getdata() {
-            const data = await updatedb()
-            return data
+            await updatedb().then(data => {
+                loaddata.textContent = ""
+                const updatesplit = data.split("\n")
+                updatesplit.array.forEach(item => {
+                    console.log(item)
+                });
+            }).catch(error => {
+
+            })
         }
-        console.log(getdata())
+        getdata()
     </script>
 </body>
 </html>
