@@ -8,77 +8,94 @@
 </head>
 <body>
     <nav>
-        <img></img> Anisave
+        <img src="logo.png" alt="Anisave Logo"> Anisave
     </nav>
+
     <div id="alert">
         <br>
-        <alerttitle>Alert</alerttitle>
-        <alertcaption>
-            <p>
-                dqdqdwdqfqw
-                fqwf
-                wqf
-                qwfwfqfqfqwf
-            </p>
-        </alertcaption>
+        <h2>Alert</h2>
+        <p>dqdqdwdqfqw<br>fqwf<br>wqf<br>qwfwfqfqfqwf</p>
         <button>⛌</button>
         <br>
     </div>
-    <comment>
-        <textarea id="query"></textarea> <dropdown><button id="starselect">Rate</button><div><div id="stardropdown">
-        </div></div></dropdown><br><button id="send">Submit</button>
-    </comment>
-    <load>
-        <div id="load">
-            <div>
-                <comment><p id="content">qdqwdqwdqwdqwfqwfqwf</p></comment><br>
-                <star id="starrate">★★★★★ (5)</star> <button id="delete">🗑</button>
+
+    <div id="comment">
+        <textarea id="query"></textarea>
+        <div id="dropdown">
+            <button id="starselect">Rate</button>
+            <div id="stardropdown"></div>
+        </div>
+        <br>
+        <button id="send">Submit</button>
+    </div>
+
+    <div id="load">
+        <div>
+            <div class="comment-item">
+                <p id="content">qdqwdqwdqwdqwfqwfqwf</p>
+                <br>
+                <span id="starrate">★★★★★ (5)</span>
+                <button id="delete">🗑</button>
             </div>
         </div>
-    </load>
+    </div>
+
     <script>
-        const doc = document
-        const stardropdown = doc.getElementById("stardropdown")
-        const loaddata = doc.getElementById("load")
-        //Rate element generate
+        const doc = document;
+        const stardropdown = doc.getElementById("stardropdown");
+        const loaddata = doc.getElementById("load");
+
+        // Generate rating buttons
         for (let star = 1; star <= 5; star++) {
-            const buttonstar = doc.createElement("button")
-            buttonstar.textContent = star + " ★"
-            buttonstar.id = star + "star"
-            stardropdown.appendChild(buttonstar)
-            const br = doc.createElement("br")
-            stardropdown.appendChild(br)
-            console.log(star)
+            const buttonstar = doc.createElement("button");
+            buttonstar.textContent = `${star} ★`;
+            buttonstar.id = `${star}star`;
+            stardropdown.appendChild(buttonstar);
+            const br = doc.createElement("br");
+            stardropdown.appendChild(br);
         }
-        
-        //API
-        const dburl = "/db"
-        async function updatedb() {
-            const xhr = new XMLHttpRequest()
-            xhr.open("GET", dburl, true)
+
+        // API call for updating database using XMLHttpRequest
+        const dburl = "/db";
+
+        function updatedb() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", dburl, true);
             xhr.onreadystatechange = function() {
-                if (xhr.status === 200) {
-                    return xhr.responseText
-                }   
-            }
-            xhr.setRequestHeader("Content-Type", "text/html")
-            xhr.send()
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    displayData(xhr.responseText);
+                }
+            };
+            xhr.setRequestHeader("Content-Type", "text/html");
+            xhr.send();
         }
 
-        // Data generate
-        async function getdata() {
-            const viaapi = await updatedb()
-            viaapi.then(data => {
-                loaddata.textContent = ""
-                const updatesplit = data.split("\n")
-                updatesplit.forEach(item => {
-                    console.log(item)
-                });
-            }).catch(error => {
+        // Function to display data
+        function displayData(data) {
+            loaddata.innerHTML = '';
+            const updatesplit = data.split("\n");
+            updatesplit.forEach(item => {
+                const commentDiv = doc.createElement('div');
+                const contentP = doc.createElement('p');
+                const starSpan = doc.createElement('span');
+                const deleteButton = doc.createElement('button');
 
-            })
+                contentP.textContent = item;
+                starSpan.textContent = '★★★★★ (5)';
+                deleteButton.textContent = '🗑';
+                deleteButton.id = 'delete';
+
+                commentDiv.classList.add('comment-item');
+                commentDiv.appendChild(contentP);
+                commentDiv.appendChild(starSpan);
+                commentDiv.appendChild(deleteButton);
+
+                loaddata.appendChild(commentDiv);
+            });
         }
-        getdata()
+
+        // Fetch and render data
+        updatedb();
     </script>
 </body>
 </html>
