@@ -64,10 +64,11 @@
             xhr.setRequestHeader("Content-Type", "text/html")
             xhr.send()
         }
-        
+
         // Data generate
         async function getdata() {
-            await updatedb().then(data => {
+            const viaapi = await updatedb()
+            viaapi.then(data => {
                 loaddata.textContent = ""
                 const updatesplit = data.split("\n")
                 updatesplit.array.forEach(item => {
