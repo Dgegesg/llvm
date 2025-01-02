@@ -1,7 +1,7 @@
 import ffmpeg
 
 # HLS Stream URL
-hls_url = "https://hls.animeindy.com:8443/vid/1CQPbr6JGZ/video.mp4/chunk.m3u8?nimblesessionid=27081552"
+hls_url = "https://hls.animeindy.com:8443/vid/1CQPbr6JGZ/video.mp4/chunk.m3u8?nimblesessionid=27108364"
 
 # Output File
 output_file = "output.mp4"
