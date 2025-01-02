@@ -163,7 +163,7 @@
         // Event listener for Delete button
         doc.addEventListener("click", function(e) {
             if (e.target && e.target.id === "delete") {
-               console.log(e.target.star, e.target.data)
+               console.log(e.target)
             }
         });
 
