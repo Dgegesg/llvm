@@ -74,14 +74,14 @@
                     const deleteButton = doc.createElement('button');
                     const starsplit = item.split(' | star: ')
                     contentP.textContent = starsplit[0];
-                    starSpan.textContent = `${"★".repeat(Number(starsplit[1]))} (${starsplit[1]})`;
+                    starSpan.textContent = ` (${starsplit[1]}) ${"★".repeat(Number(starsplit[1]))}`;
                     deleteButton.textContent = '🗑';
                     deleteButton.id = 'delete';
     
                     commentDiv.classList.add('dataonload');
                     commentDiv.appendChild(contentP);
-                    commentDiv.appendChild(starSpan);
                     commentDiv.appendChild(deleteButton);
+                    commentDiv.appendChild(starSpan);
                     loaddata.appendChild(commentDiv);
                 }
             });
